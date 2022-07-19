@@ -58,14 +58,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final loginButton = Material(
       borderRadius: BorderRadius.circular(21),
-      color:Colors.lightGreen,
+      color: Colors.lightGreen,
       child: MaterialButton(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-          minWidth: MediaQuery.of(context).size.width,
-          child: const Text('Login',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: 16)),
-          /*onPressed: () async {
+        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+        minWidth: MediaQuery.of(context).size.width,
+        child: const Text('Login',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white, fontSize: 16)),
+        /*onPressed: () async {
               try {
                 final user =
                 await firebaseAuth.signInWithEmailAndPassword(
@@ -79,10 +79,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 }
               }
             },*/
-          onPressed: () {
-            print('pressed');
-          },
-        ),
+        onPressed: () {
+          print('pressed');
+        },
+      ),
     );
 
     return Scaffold(
@@ -90,16 +90,16 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Center(
         child: SingleChildScrollView(
           child: Container(
-            height:MediaQuery.of(context).size.height,
+            height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             decoration: const BoxDecoration(
                 image: DecorationImage(
-              image: AssetImage('assets/images/background1.jpg'),
-              fit: BoxFit.cover,colorFilter: ColorFilter.mode(
-                  Colors.white,
-                  BlendMode.darken,
-                )
-            )),
+                    image: AssetImage('assets/images/background1.jpg'),
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.darken,
+                    ))),
             child: Padding(
               padding: const EdgeInsets.all(21.0),
               child: Form(
