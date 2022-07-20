@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             icon: const Icon(
               Icons.logout_rounded,
-              size: 20,
+              size: 44,
               color: Colors.deepOrange,
             ),alignment: Alignment.topRight,),
       ),
