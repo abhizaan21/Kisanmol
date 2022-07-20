@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "144720103000",
+    "project_id": "kisanmol-ba099",
+    "storage_bucket": "kisanmol-ba099.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:144720103000:android:1f9362d39564dba423ec2d",
+        "android_client_info": {
+          "package_name": "com.example.kisanmol_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "144720103000-bc4eb7inta7rhjn3r9it7r00kgr0v9sj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.kisanmol_app",
+            "certificate_hash": "2c56f8cff3519b71675b702a56b563cae8232360"
+          }
+        },
+        {
+          "client_id": "144720103000-hj4e7f9rpgovn631um9vdtg09d402h96.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOMzL43oC_tJ0y2gHqDQxIaidnqwvFIlU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "144720103000-hj4e7f9rpgovn631um9vdtg09d402h96.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
