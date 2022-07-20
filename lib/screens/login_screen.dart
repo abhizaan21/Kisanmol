@@ -16,8 +16,10 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
   //editing controller
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  bool isPasswordVisible = false;
 
   //Firebase auth
   final _auth = FirebaseAuth.instance;
@@ -25,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final emailField = TextFormField(
-      autofocus: true,
+      autofocus: false,
       controller: emailController,
       keyboardType: TextInputType.emailAddress,
       validator: (value) {
@@ -43,18 +45,19 @@ class _LoginScreenState extends State<LoginScreen> {
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.mail, color: Colors.orange),
+        prefixIcon: const Icon(Icons.mail, color: Colors.deepOrangeAccent),
         contentPadding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
-        hintText: "Email",
+        hintText: "name@example.com",
+        labelText: "Email",
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(21.0),
+          borderRadius: BorderRadius.circular(25.0),
         ),
       ),
     );
 
     final passwordField = TextFormField(
       controller: passwordController,
-      obscureText: true,
+      obscureText: !isPasswordVisible,
       validator: (value) {
         //Password validator
         RegExp regex = RegExp(r'^.{6,}$');
@@ -63,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
           return ("Password is required for login");
         }
         if (!regex.hasMatch(value)) {
-          return ("Please enter a valid password of 6 character");
+          return ("Please enter a valid password min of 6 character");
         }
 
         return null;
@@ -73,18 +76,26 @@ class _LoginScreenState extends State<LoginScreen> {
       },
       textInputAction: TextInputAction.done,
       decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.lock_sharp, color: Colors.orange),
+        prefixIcon:
+            const Icon(Icons.lock_sharp, color: Colors.deepOrangeAccent),
         contentPadding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
         hintText: "Password",
+        suffixIcon: IconButton(
+          icon: isPasswordVisible
+              ? const Icon(Icons.visibility_off, color: Colors.deepOrangeAccent)
+              : const Icon(Icons.visibility, color: Colors.black45),
+          onPressed: () =>
+              setState(() => isPasswordVisible = !isPasswordVisible),
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(21.0),
+          borderRadius: BorderRadius.circular(25.0),
         ),
       ),
     );
 
     final loginButton = Material(
       borderRadius: BorderRadius.circular(21),
-      color: Colors.lightGreen,
+      color: Colors.teal,
       child: MaterialButton(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           minWidth: MediaQuery.of(context).size.width,
@@ -119,10 +130,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     SizedBox(
-                        height: 221,
+                        height: 200,
                         child: Image.asset('assets/images/Logo.png')),
                     const SizedBox(
-                      height: 15,
+                      height: 50,
                     ),
                     emailField,
                     const SizedBox(
@@ -142,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: <Widget>[
                         const Text(
                           "Don't have an account? ",
-                          style: TextStyle(fontSize: 14, color: Colors.black54),
+                          style: TextStyle(fontSize: 14, color: Colors.black),
                         ),
                         GestureDetector(
                             onTap: () {
@@ -153,11 +164,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                           const RegistrationScreen()));
                             },
                             child: const Text(
-                              "SignUp",
+                              "Register",
                               style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.deepOrange,
-                                  decoration: TextDecoration.underline),
+                                fontSize: 18,
+                                color: Colors.deepOrange,
+                              ),
                             ))
                       ],
                     )
