@@ -19,11 +19,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   //form key
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController firstNameEditingController = TextEditingController();
-  final TextEditingController secondNameEditingController = TextEditingController();
+  final TextEditingController firstNameEditingController =
+      TextEditingController();
+  final TextEditingController secondNameEditingController =
+      TextEditingController();
   final TextEditingController emailEditingController = TextEditingController();
-  final TextEditingController passwordEditingController = TextEditingController();
-  final TextEditingController confirmPasswordEditingController = TextEditingController();
+  final TextEditingController passwordEditingController =
+      TextEditingController();
+  final TextEditingController confirmPasswordEditingController =
+      TextEditingController();
 
   bool isPasswordVisible = false;
 
@@ -32,7 +36,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     //Start of the creation of the field for different input type
 
     final firstNameField = TextFormField(
-      autofocus: true,
       controller: firstNameEditingController,
       keyboardType: TextInputType.name,
       validator: (value) {
@@ -278,7 +281,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ),
                     confirmPasswordField,
                     const SizedBox(
-                      height: 15,
+                      height: 25,
                     ),
                     signUpButton,
                     const SizedBox(

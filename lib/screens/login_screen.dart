@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kisanmol_app/screens/home_screen.dart';
 import 'package:kisanmol_app/screens/registration_screen.dart';
+import '../services/auth_dart.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -107,6 +109,26 @@ class _LoginScreenState extends State<LoginScreen> {
           }),
     );
 
+    //Google SignIn Button
+    final googleSignInButton = ButtonTheme(
+        padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
+        child: ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+                primary: Colors.white,
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25.0))),
+            label: const Text('Sign In with Google',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.black, fontSize: 16)),
+            onPressed: () {
+              AuthService().signInWithGoogle();
+            },
+            icon: const FaIcon(
+              FontAwesomeIcons.google,
+              color: Colors.red,
+            )));
+
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -141,9 +163,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     passwordField,
                     const SizedBox(
-                      height: 15,
+                      height: 25,
                     ),
                     loginButton,
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    googleSignInButton,
                     const SizedBox(
                       height: 15,
                     ),
