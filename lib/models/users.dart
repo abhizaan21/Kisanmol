@@ -4,6 +4,7 @@ class UserModel {
   String? firstName;
   String? secondName;
 
+  //Details of user for Email sigIn
   UserModel({this.uid, this.email, this.firstName, this.secondName});
 
   //Data from the server

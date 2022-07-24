@@ -4,7 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kisanmol_app/screens/home_screen.dart';
 import 'package:kisanmol_app/screens/registration_screen.dart';
-import '../services/auth_dart.dart';
+import '../services/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -18,8 +18,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
   //editing controller
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   bool isPasswordVisible = false;
 
@@ -105,29 +105,30 @@ class _LoginScreenState extends State<LoginScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white, fontSize: 16)),
           onPressed: () {
-            logIn(emailController.text, passwordController.text);
+            logInWIthEmail(emailController.text, passwordController.text);
           }),
     );
 
     //Google SignIn Button
     final googleSignInButton = ButtonTheme(
-        padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
-        child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-                primary: Colors.white,
-                minimumSize: const Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25.0))),
-            label: const Text('Sign In with Google',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black, fontSize: 16)),
-            onPressed: () {
-              AuthService().signInWithGoogle();
-            },
-            icon: const FaIcon(
-              FontAwesomeIcons.google,
-              color: Colors.red,
-            )));
+      padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
+      child: ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+              primary: Colors.white,
+              minimumSize: const Size(double.infinity, 48),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25.0))),
+          label: const Text('Sign In with Google',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.black, fontSize: 16)),
+          onPressed: () {
+            FirebaseAuthMethods().signInWithGoogle();
+          },
+          icon: const FaIcon(
+            FontAwesomeIcons.google,
+            color: Colors.red,
+          )),
+    );
 
     return Scaffold(
       body: Center(
@@ -209,7 +210,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   //LogIn function
-  void logIn(String email, String password) async {
+  Future<void> logInWIthEmail(
+    String email,
+    String password,
+  ) async {
     if (_formKey.currentState!.validate()) {
       await _auth
           .signInWithEmailAndPassword(email: email, password: password)
@@ -223,6 +227,8 @@ class _LoginScreenState extends State<LoginScreen> {
           .catchError((e) {
         Fluttertoast.showToast(msg: e!.message);
       });
+    } else {
+      (await FirebaseAuthMethods().signInWithGoogle());
     }
   }
 }

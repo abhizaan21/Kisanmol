@@ -202,7 +202,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white, fontSize: 16)),
             onPressed: () {
-              signUp(
+              signUpUser(
                   emailEditingController.text, passwordEditingController.text);
             }));
 
@@ -322,7 +322,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  void signUp(String email, String password) async {
+  void signUpUser(String email, String password) async {
     if (_formKey.currentState!.validate()) {
       await _auth
           .createUserWithEmailAndPassword(email: email, password: password)
