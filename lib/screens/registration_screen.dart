@@ -1,21 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kisanmol_app/models/users.dart';
 import 'package:kisanmol_app/screens/home_screen.dart';
 import 'package:kisanmol_app/screens/login_screen.dart';
+import 'package:kisanmol_app/services/auth_service.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
-
+  static String id = 'registration';
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  final _auth = FirebaseAuth.instance;
+  firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
   //form key
   final _formKey = GlobalKey<FormState>();
 
@@ -28,8 +32,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       TextEditingController();
   final TextEditingController confirmPasswordEditingController =
       TextEditingController();
-
+  bool circular = false;
   bool isPasswordVisible = false;
+  AuthClass authClass = AuthClass();
 
   @override
   Widget build(BuildContext context) {
@@ -201,10 +206,55 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             child: const Text('Register',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white, fontSize: 16)),
-            onPressed: () {
-              signUpUser(
-                  emailEditingController.text, passwordEditingController.text);
+            onPressed: () async {
+              setState(() {
+                circular = true;
+              });
+              try {
+                firebase_auth.UserCredential userCredential =
+                    await firebaseAuth.createUserWithEmailAndPassword(
+                        email: emailEditingController.text,
+                        password: passwordEditingController.text);
+                Fluttertoast.showToast(msg: "Account created successfully !");
+                if (kDebugMode) {
+                  print("Error occurred while registering");
+                }
+                setState(() {
+                  circular = false;
+                });
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (builder) => const HomePage()),
+                    (route) => false);
+              } catch (e) {
+                final snackbar = SnackBar(content: Text(e.toString()));
+                ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                setState(() {
+                  circular = false;
+                });
+              }
             }));
+
+    //Google signUp button
+    final googleSignUpButton = ButtonTheme(
+      padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
+      child: ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+              primary: Colors.white,
+              minimumSize: const Size(double.infinity, 48),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25.0))),
+          label: const Text('Continue with Google',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.black, fontSize: 16)),
+          onPressed: () async {
+            await authClass.googleSignIn(context);
+          },
+          icon: const FaIcon(
+            FontAwesomeIcons.google,
+            color: Colors.red,
+          )),
+    );
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -220,7 +270,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         backgroundColor: Colors.transparent,
         leading: IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()));
             },
             icon: const Icon(
               Icons.arrow_back,
@@ -287,6 +338,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     const SizedBox(
                       height: 15,
                     ),
+                    googleSignUpButton,
+                    const SizedBox(
+                      height: 15,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -322,23 +377,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  void signUpUser(String email, String password) async {
-    if (_formKey.currentState!.validate()) {
-      await _auth
-          .createUserWithEmailAndPassword(email: email, password: password)
-          .then((value) => {postDetailsToServer()})
-          .catchError((e) {
-        Fluttertoast.showToast(msg: e!.message);
-      });
-    }
-  }
-
   postDetailsToServer() async {
     //calling our users.dart for storing the data
 
     //calling our firestore
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    User? user = _auth.currentUser;
+    User? user = firebase_auth.UserCredential as firebase_auth.User?;
 
     //calling our user model for storing the data
     UserModel userModel = UserModel();
@@ -354,10 +398,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         .doc(user.uid)
         .set(userModel.toMap());
 
-    Fluttertoast.showToast(msg: "Account created successfully !");
     Navigator.pushAndRemoveUntil(
         (context),
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => const HomePage()),
         (route) => false);
   }
 }

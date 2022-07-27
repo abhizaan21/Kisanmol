@@ -1,14 +1,15 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kisanmol_app/screens/home_screen.dart';
 import 'package:kisanmol_app/screens/registration_screen.dart';
-import '../services/firebase_auth.dart';
+import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
-
+  static String id = 'login';
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -16,15 +17,16 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   //form key
   final _formKey = GlobalKey<FormState>();
-
+  final storage = const FlutterSecureStorage();
   //editing controller
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
   bool isPasswordVisible = false;
+  bool circular = false;
 
   //Firebase auth
-  final _auth = FirebaseAuth.instance;
+  firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
+  AuthClass authClass = AuthClass();
 
   @override
   Widget build(BuildContext context) {
@@ -104,8 +106,31 @@ class _LoginScreenState extends State<LoginScreen> {
           child: const Text('Login',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white, fontSize: 16)),
-          onPressed: () {
-            logInWIthEmail(emailController.text, passwordController.text);
+          onPressed: () async {
+            try {
+              firebase_auth.UserCredential userCredential =
+                  await firebaseAuth.signInWithEmailAndPassword(
+                      email: emailController.text,
+                      password: passwordController.text);
+              const snackBar = SnackBar(content: Text("Logged In Successfully"));
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              if (kDebugMode) {
+                print(userCredential.user?.email);
+              }
+              setState(() {
+                circular = false;
+              });
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (builder) => const HomePage()),
+                  (route) => false);
+            } catch (e) {
+              final snackbar = SnackBar(content: Text(e.toString()));
+              ScaffoldMessenger.of(context).showSnackBar(snackbar);
+              setState(() {
+                circular = false;
+              });
+            }
           }),
     );
 
@@ -122,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.black, fontSize: 16)),
           onPressed: () {
-            FirebaseAuthMethods().signInWithGoogle();
+            authClass.googleSignIn(context);
           },
           icon: const FaIcon(
             FontAwesomeIcons.google,
@@ -184,11 +209,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         GestureDetector(
                             onTap: () {
-                              Navigator.push(
+                              Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          const RegistrationScreen()));
+                                      builder: (builder) =>
+                                          const RegistrationScreen()),
+                                  (route) => false);
                             },
                             child: const Text(
                               "Register",
@@ -207,28 +233,5 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-  }
-
-  //LogIn function
-  Future<void> logInWIthEmail(
-    String email,
-    String password,
-  ) async {
-    if (_formKey.currentState!.validate()) {
-      await _auth
-          .signInWithEmailAndPassword(email: email, password: password)
-          .then((uid) => {
-                Fluttertoast.showToast(msg: "Login Successful"),
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const HomeScreen())),
-              })
-          .catchError((e) {
-        Fluttertoast.showToast(msg: e!.message);
-      });
-    } else {
-      (await FirebaseAuthMethods().signInWithGoogle());
-    }
   }
 }

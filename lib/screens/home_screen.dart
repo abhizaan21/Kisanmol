@@ -1,80 +1,70 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:kisanmol_app/models/users.dart';
 import 'package:kisanmol_app/screens/login_screen.dart';
+import '../services/auth_service.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+  static String id = 'homepage';
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  User? user = FirebaseAuth.instance.currentUser;
-  UserModel signedInUser = UserModel();
-
-  @override
-  void initState() {
-    super.initState();
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(user!.uid)
-        .get()
-        .then((value) {
-      signedInUser = UserModel.fromMap(value.data());
-      setState(() {});
-    });
-  }
-
+class _HomePageState extends State<HomePage> {
+  AuthClass authClass = AuthClass();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        title: const Text("Welcome"),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        leading: IconButton(
-          onPressed: () async {
-            await FirebaseAuth.instance.signOut();
-            Navigator.pop(
-              context,
-              MaterialPageRoute(builder: (context) => const LoginScreen()),
-            );
-          },
-          icon: const Icon(
-            Icons.logout_rounded,
-            size: 35,
-            color: Colors.deepOrange,
-          ),
-          alignment: Alignment.topLeft,
+        appBar: AppBar(
+          backgroundColor: Colors.deepOrangeAccent,
+          actions: [
+            IconButton(
+                icon: const Icon(Icons.logout),
+                onPressed: () async {
+                  await authClass.signOut(context: context);
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (builder) => const LoginScreen()),
+                      (route) => false);
+                  const snackBar = SnackBar(content: Text("Logged Out"));
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                }),
+          ],
         ),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(21),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              SizedBox(
-                height: 121,
-                child: Image.asset("assets/images/homeimg1.jpg",
-                    fit: BoxFit.contain),
-              ),
-              Text(
-                'Here you are ${signedInUser.firstName}${signedInUser.secondName}',
-                style: GoogleFonts.cuteFont(
-                    fontSize: 21, fontWeight: FontWeight.bold),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
+        body: Center(
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Image.asset('assets/images/homeimg1.jpg'),
+            const SizedBox(
+              height: 20,
+            ),
+            Text("${FirebaseAuth.instance.currentUser!.displayName}"),
+            Text("${FirebaseAuth.instance.currentUser!.email}"),
+            const SizedBox(
+              height: 20,
+            ),ButtonTheme(
+            padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
+            child: ElevatedButton.icon(style: ElevatedButton.styleFrom(
+                primary: Colors.deepOrangeAccent,
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25.0))),
+              label: const Text('Log Out',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, fontSize: 16)),
+              onPressed: () async {
+                await authClass.signOut(context: context);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const LoginScreen()));
+              }, icon: const Icon(Icons.logout),
+            )),
+          ],
+        )));
   }
 }
