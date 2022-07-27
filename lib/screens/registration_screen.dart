@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kisanmol_app/models/users.dart';
 import 'package:kisanmol_app/screens/home_screen.dart';
@@ -34,7 +33,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       TextEditingController();
   bool circular = false;
   bool isPasswordVisible = false;
-  AuthClass authClass = AuthClass();
 
   @override
   Widget build(BuildContext context) {
@@ -215,6 +213,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     await firebaseAuth.createUserWithEmailAndPassword(
                         email: emailEditingController.text,
                         password: passwordEditingController.text);
+                AuthService(firebase_auth.FirebaseAuth.instance).storeTokenAndData(userCredential);
                 Fluttertoast.showToast(msg: "Account created successfully !");
                 if (kDebugMode) {
                   print("Error occurred while registering");
@@ -234,27 +233,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 });
               }
             }));
-
-    //Google signUp button
-    final googleSignUpButton = ButtonTheme(
-      padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
-      child: ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-              primary: Colors.white,
-              minimumSize: const Size(double.infinity, 48),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25.0))),
-          label: const Text('Continue with Google',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black, fontSize: 16)),
-          onPressed: () async {
-            await authClass.googleSignIn(context);
-          },
-          icon: const FaIcon(
-            FontAwesomeIcons.google,
-            color: Colors.red,
-          )),
-    );
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -335,10 +313,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       height: 25,
                     ),
                     signUpButton,
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    googleSignUpButton,
                     const SizedBox(
                       height: 15,
                     ),

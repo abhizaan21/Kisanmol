@@ -1,13 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kisanmol_app/screens/home_screen.dart';
 import 'package:kisanmol_app/screens/login_screen.dart';
 
-class AuthClass {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+import '../utils/resource.dart';
+
+class AuthService {
+  final FirebaseAuth _auth;
+  AuthService(this._auth);
+
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: [
       'email',
@@ -15,8 +20,10 @@ class AuthClass {
     ],
   );
 
+  Stream<User?> get authState => FirebaseAuth.instance.authStateChanges();
+
   final storage = const FlutterSecureStorage();
-  Future<void> googleSignIn( BuildContext context) async {
+  Future<void> googleSignIn(BuildContext context) async {
     try {
       GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
       GoogleSignInAuthentication? googleSignInAuthentication =
@@ -46,6 +53,35 @@ class AuthClass {
     }
   }
 
+
+   Future<Resource?> signInWithFacebook(BuildContext context) async {
+    try {
+      final LoginResult result = await FacebookAuth.instance.login();
+      switch (result.status) {
+        case LoginStatus.success:
+          final AuthCredential facebookCredential =
+          FacebookAuthProvider.credential(result.accessToken!.token);
+          final userCredential =
+          await _auth.signInWithCredential(facebookCredential);
+          storeTokenAndData(userCredential);
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (builder) => const HomePage()),
+                  (route) => false);
+          return Resource(status: Status.success);
+        case LoginStatus.cancelled:
+          return Resource(status: Status.cancelled);
+        case LoginStatus.failed:
+          return Resource(status: Status.error);
+        default:
+          return null;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+
   Future<void> signOut({required BuildContext context}) async {
     try {
       FirebaseAuth.instance.signOut();
@@ -55,12 +91,12 @@ class AuthClass {
       Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (builder) => const LoginScreen()),
-              (route) => false);
+          (route) => false);
 
       const snackBar = SnackBar(content: Text("Logged Out"));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     } catch (e) {
-      const snackBar =  SnackBar(content: Text("Error occurred"));
+      const snackBar = SnackBar(content: Text("Error occurred"));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
@@ -80,7 +116,7 @@ class AuthClass {
   }
 
   void showSnackBar(BuildContext context, String text) {
-    const snackBar = SnackBar(content: Text("text"));
+    const snackBar = SnackBar(content: Text("Failed"));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

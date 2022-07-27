@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:kisanmol_app/screens/home_screen.dart';
 import 'package:kisanmol_app/screens/registration_screen.dart';
 import '../services/auth_service.dart';
 
@@ -26,7 +25,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   //Firebase auth
   firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
-  AuthClass authClass = AuthClass();
 
   @override
   Widget build(BuildContext context) {
@@ -112,18 +110,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   await firebaseAuth.signInWithEmailAndPassword(
                       email: emailController.text,
                       password: passwordController.text);
-              const snackBar = SnackBar(content: Text("Logged In Successfully"));
+              AuthService(firebase_auth.FirebaseAuth.instance).storeTokenAndData(userCredential);
+              const snackBar =
+                  SnackBar(content: Text("Logged In Successfully"));
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
               if (kDebugMode) {
-                print(userCredential.user?.email);
+                print("logged In failed");
               }
               setState(() {
                 circular = false;
               });
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (builder) => const HomePage()),
-                  (route) => false);
             } catch (e) {
               final snackbar = SnackBar(content: Text(e.toString()));
               ScaffoldMessenger.of(context).showSnackBar(snackbar);
@@ -143,16 +139,39 @@ class _LoginScreenState extends State<LoginScreen> {
               minimumSize: const Size(double.infinity, 48),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(25.0))),
-          label: const Text('Sign In with Google',
+          label: const Text('Continue with Google',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.black, fontSize: 16)),
           onPressed: () {
-            authClass.googleSignIn(context);
+            AuthService(firebase_auth.FirebaseAuth.instance)
+                .googleSignIn(context);
           },
           icon: const FaIcon(
             FontAwesomeIcons.google,
             color: Colors.red,
           )),
+    );
+
+    //Facebook Login
+    final facebookLoginButton = ButtonTheme(
+      padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
+      child: ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+            primary: Colors.white,
+            minimumSize: const Size(double.infinity, 48),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25.0))),
+        label: const Text('Continue with Facebook',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.black, fontSize: 16)),
+        onPressed: () {
+          AuthService(firebase_auth.FirebaseAuth.instance).signInWithFacebook(context);
+          },
+        icon: const FaIcon(
+          FontAwesomeIcons.facebook,
+          color: Colors.blueAccent,
+        ),
+      ),
     );
 
     return Scaffold(
@@ -181,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 200,
                         child: Image.asset('assets/images/Logo.png')),
                     const SizedBox(
-                      height: 50,
+                      height: 40,
                     ),
                     emailField,
                     const SizedBox(
@@ -189,13 +208,25 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     passwordField,
                     const SizedBox(
-                      height: 25,
+                      height: 20,
                     ),
                     loginButton,
                     const SizedBox(
                       height: 15,
                     ),
+                    const Text(
+                      '- OR -',
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black),
+                    ),
+                    const SizedBox(height: 15.0),
                     googleSignInButton,
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    facebookLoginButton,
                     const SizedBox(
                       height: 15,
                     ),

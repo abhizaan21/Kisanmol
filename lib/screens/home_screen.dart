@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kisanmol_app/screens/login_screen.dart';
@@ -7,12 +8,15 @@ class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
   static String id = 'homepage';
 
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  AuthClass authClass = AuthClass();
+  firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +27,7 @@ class _HomePageState extends State<HomePage> {
             IconButton(
                 icon: const Icon(Icons.logout),
                 onPressed: () async {
-                  await authClass.signOut(context: context);
+                  await AuthService(firebase_auth.FirebaseAuth.instance).signOut(context: context);
                   Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
@@ -57,7 +61,7 @@ class _HomePageState extends State<HomePage> {
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white, fontSize: 16)),
               onPressed: () async {
-                await authClass.signOut(context: context);
+                await AuthService(firebase_auth.FirebaseAuth.instance).signOut(context: context);
                 Navigator.push(
                     context,
                     MaterialPageRoute(

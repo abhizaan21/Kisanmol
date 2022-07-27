@@ -25,14 +25,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  AuthClass authClass = AuthClass();
   Widget currentPage = const IntroScreen();
   firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
   late StreamSubscription<User?> user;
 
   @override
   void initState() {
-    checkLogin();
     super.initState();
     user = FirebaseAuth.instance.authStateChanges().listen((user) {
       if (user == null) {
@@ -45,6 +43,7 @@ class _MyAppState extends State<MyApp> {
         }
       }
     });
+    checkLogin();
   }
 
   @override
@@ -54,7 +53,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   checkLogin() async {
-    String? token = await authClass.getToken();
+    String? token =
+        await AuthService(firebase_auth.FirebaseAuth.instance).getToken();
     if (kDebugMode) {
       print("token");
     }
@@ -68,7 +68,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: FirebaseAuth.instance.currentUser == null
+      initialRoute: firebaseAuth.currentUser == null
           ? LoginScreen.id
           : HomePage.id,
 
