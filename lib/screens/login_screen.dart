@@ -96,10 +96,10 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     final loginButton = Material(
-      borderRadius: BorderRadius.circular(21),
+      borderRadius: BorderRadius.circular(25.0),
       color: Colors.teal,
       child: MaterialButton(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+          padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
           minWidth: MediaQuery.of(context).size.width,
           child: const Text('Login',
               textAlign: TextAlign.center,
@@ -110,7 +110,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   await firebaseAuth.signInWithEmailAndPassword(
                       email: emailController.text,
                       password: passwordController.text);
-              AuthService(firebase_auth.FirebaseAuth.instance).storeTokenAndData(userCredential);
+              AuthService(firebase_auth.FirebaseAuth.instance)
+                  .storeTokenAndData(userCredential);
               const snackBar =
                   SnackBar(content: Text("Logged In Successfully"));
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -141,14 +142,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.circular(25.0))),
           label: const Text('Continue with Google',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black, fontSize: 16)),
+              style: TextStyle(color: Colors.black54, fontSize: 16)),
           onPressed: () {
             AuthService(firebase_auth.FirebaseAuth.instance)
                 .googleSignIn(context);
           },
           icon: const FaIcon(
             FontAwesomeIcons.google,
-            color: Colors.red,
+            color: Colors.deepOrangeAccent,
           )),
     );
 
@@ -157,19 +158,20 @@ class _LoginScreenState extends State<LoginScreen> {
       padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
       child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
-            primary: Colors.white,
+            primary: Colors.blueAccent,
             minimumSize: const Size(double.infinity, 48),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25.0))),
         label: const Text('Continue with Facebook',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.black, fontSize: 16)),
+            style: TextStyle(color: Colors.white, fontSize: 16)),
         onPressed: () {
-          AuthService(firebase_auth.FirebaseAuth.instance).signInWithFacebook(context);
-          },
+          AuthService(firebase_auth.FirebaseAuth.instance)
+              .signInWithFacebook(context);
+        },
         icon: const FaIcon(
           FontAwesomeIcons.facebook,
-          color: Colors.blueAccent,
+          color: Colors.white,
         ),
       ),
     );
@@ -215,11 +217,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 15,
                     ),
                     const Text(
-                      '- OR -',
+                      '⎯⎯⎯⎯⎯⎯⎯⎯ or⎯⎯⎯⎯⎯⎯⎯⎯',
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.normal,
-                          color: Colors.black),
+                          color: Colors.black54),
                     ),
                     const SizedBox(height: 15.0),
                     googleSignInButton,

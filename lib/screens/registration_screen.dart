@@ -199,7 +199,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         borderRadius: BorderRadius.circular(25.0),
         color: Colors.teal,
         child: MaterialButton(
-            padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
             minWidth: MediaQuery.of(context).size.width,
             child: const Text('Register',
                 textAlign: TextAlign.center,
