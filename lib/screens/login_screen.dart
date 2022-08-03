@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kisanmol_app/screens/registration_screen.dart';
 import '../services/auth_service.dart';
+import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -90,9 +91,8 @@ class _LoginScreenState extends State<LoginScreen> {
               setState(() => isPasswordVisible = !isPasswordVisible),
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(25.0),
+          borderRadius: BorderRadius.circular(25.0),),
         ),
-      ),
     );
 
     final loginButton = Material(
@@ -128,7 +128,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 circular = false;
               });
             }
-          }),
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (builder) => const HomePage()),
+                    (route) => false);}),
     );
 
     //Google SignIn Button
