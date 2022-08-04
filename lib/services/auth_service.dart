@@ -20,7 +20,7 @@ class AuthService {
     ],
   );
 
-  Stream<User?> get authState => FirebaseAuth.instance.authStateChanges();
+  Stream<User?> get authStateChanges => FirebaseAuth.instance.idTokenChanges();
 
   final storage = const FlutterSecureStorage();
   Future<void> googleSignIn(BuildContext context) async {
@@ -46,7 +46,7 @@ class AuthService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print("Login Failed");
+        print("Log In failed");
       }
       final snackBar = SnackBar(content: Text(e.toString()));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -54,20 +54,21 @@ class AuthService {
   }
 
 
-   Future<Resource?> signInWithFacebook(BuildContext context) async {
+
+  Future<Resource?> signInWithFacebook(BuildContext context) async {
     try {
       final LoginResult result = await FacebookAuth.instance.login();
       switch (result.status) {
         case LoginStatus.success:
           final AuthCredential facebookCredential =
-          FacebookAuthProvider.credential(result.accessToken!.token);
+              FacebookAuthProvider.credential(result.accessToken!.token);
           final userCredential =
-          await _auth.signInWithCredential(facebookCredential);
+              await _auth.signInWithCredential(facebookCredential);
           storeTokenAndData(userCredential);
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (builder) => const HomePage()),
-                  (route) => false);
+              (route) => false);
           return Resource(status: Status.success);
         case LoginStatus.cancelled:
           return Resource(status: Status.cancelled);
@@ -81,8 +82,7 @@ class AuthService {
     }
   }
 
-
-  Future<void> signOut({required BuildContext context}) async {
+  Future<void> signOut(BuildContext context) async {
     try {
       FirebaseAuth.instance.signOut();
       await _googleSignIn.signOut();
