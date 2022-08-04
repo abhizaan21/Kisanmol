@@ -23,7 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
   bool isPasswordVisible = false;
   bool circular = false;
-
   //Firebase auth
   firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
 
@@ -91,8 +90,9 @@ class _LoginScreenState extends State<LoginScreen> {
               setState(() => isPasswordVisible = !isPasswordVisible),
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(25.0),),
+          borderRadius: BorderRadius.circular(25.0),
         ),
+      ),
     );
 
     final loginButton = Material(
@@ -112,6 +112,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       password: passwordController.text);
               AuthService(firebase_auth.FirebaseAuth.instance)
                   .storeTokenAndData(userCredential);
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (builder) =>  const HomePage()),
+                      (route) => false);
               const snackBar =
                   SnackBar(content: Text("Logged In Successfully"));
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -128,10 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 circular = false;
               });
             }
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (builder) => const HomePage()),
-                    (route) => false);}),
+          }),
     );
 
     //Google SignIn Button
@@ -180,94 +181,91 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          child: Container(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            decoration: const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage('assets/images/background1.jpg'),
-                    fit: BoxFit.cover,
-                    colorFilter: ColorFilter.mode(
-                      Colors.white,
-                      BlendMode.darken,
-                    ))),
-            child: Padding(
-              padding: const EdgeInsets.all(21.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
+        body: Center(
+            child: SingleChildScrollView(
+      child: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        decoration: const BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage('assets/images/background1.jpg'),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                  Colors.white,
+                  BlendMode.darken,
+                ))),
+        child: Padding(
+          padding: const EdgeInsets.all(21.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(
+                    height: 200, child: Image.asset('assets/images/Logo.png')),
+                const SizedBox(
+                  height: 40,
+                ),
+                emailField,
+                const SizedBox(
+                  height: 15,
+                ),
+                passwordField,
+                const SizedBox(
+                  height: 20,
+                ),
+                loginButton,
+                const SizedBox(
+                  height: 15,
+                ),
+                const Text(
+                  '⎯⎯⎯⎯⎯⎯⎯⎯ or⎯⎯⎯⎯⎯⎯⎯⎯',
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.black54),
+                ),
+                const SizedBox(height: 15.0),
+                googleSignInButton,
+                const SizedBox(
+                  height: 15,
+                ),
+                facebookLoginButton,
+                const SizedBox(
+                  height: 15,
+                ),
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    SizedBox(
-                        height: 200,
-                        child: Image.asset('assets/images/Logo.png')),
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    emailField,
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    passwordField,
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    loginButton,
-                    const SizedBox(
-                      height: 15,
-                    ),
                     const Text(
-                      '⎯⎯⎯⎯⎯⎯⎯⎯ or⎯⎯⎯⎯⎯⎯⎯⎯',
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.black54),
+                      "Don't have an account? ",
+                      style: TextStyle(fontSize: 14, color: Colors.black),
                     ),
-                    const SizedBox(height: 15.0),
-                    googleSignInButton,
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    facebookLoginButton,
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        const Text(
-                          "Don't have an account? ",
-                          style: TextStyle(fontSize: 14, color: Colors.black),
-                        ),
-                        GestureDetector(
-                            onTap: () {
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (builder) =>
-                                          const RegistrationScreen()),
-                                  (route) => false);
-                            },
-                            child: const Text(
-                              "Register",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.deepOrange,
-                              ),
-                            ))
-                      ],
-                    )
+                    GestureDetector(
+                        onTap: () {
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (builder) =>
+                                      const RegistrationScreen()),
+                              (route) => false);
+                        },
+                        child: const Text(
+                          "Register",
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.deepOrange,
+                          ),
+                        )),
                   ],
                 ),
-              ),
+              ],
             ),
           ),
         ),
       ),
-    );
+    )));
   }
 }

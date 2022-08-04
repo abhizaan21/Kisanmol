@@ -76,7 +76,7 @@ class _MyAppState extends State<MyApp> {
       routes: {
         LoginScreen.id: (context) => const LoginScreen(),
         RegistrationScreen.id: (context) => const RegistrationScreen(),
-        HomePage.id: (context) => const HomePage(),
+        HomePage.id: (context) =>  const HomePage(),
       },
       home: currentPage,
     );

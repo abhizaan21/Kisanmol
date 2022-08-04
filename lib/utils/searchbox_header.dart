@@ -14,15 +14,15 @@ class HeaderWithSearchBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: kDefaultPadding * 2.5),
+      margin: const EdgeInsets.only(bottom: appPadding * 2.5),
       height: size.height * 0.2,
       child: Stack(
         children: <Widget>[
           Container(
             padding: const EdgeInsets.only(
-              left: kDefaultPadding,
-              right: kDefaultPadding,
-              bottom: 36 + kDefaultPadding,
+              left: appPadding,
+              right: appPadding,
+              bottom: 36 + appPadding,
             ),
             height: size.height * 0.2 - 27,
             decoration: const BoxDecoration(
@@ -50,8 +50,8 @@ class HeaderWithSearchBox extends StatelessWidget {
             right: 0,
             child: Container(
               alignment: Alignment.center,
-              margin: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
-              padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
+              margin: const EdgeInsets.symmetric(horizontal: appPadding),
+              padding: const EdgeInsets.symmetric(horizontal: appPadding),
               height: 54,
               decoration: BoxDecoration(
                 color: Colors.white,

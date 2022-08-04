@@ -223,7 +223,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 });
                 Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (builder) => const HomePage()),
+                    MaterialPageRoute(builder: (builder) =>  HomePage()),
                     (route) => false);
               } catch (e) {
                 final snackbar = SnackBar(content: Text(e.toString()));
@@ -244,7 +244,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 color: Colors.deepOrangeAccent,
                 fontSize: 30,
                 fontWeight: FontWeight.bold)),
-        centerTitle: true,
         backgroundColor: Colors.transparent,
         leading: IconButton(
             onPressed: () {
@@ -374,7 +373,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
     Navigator.pushAndRemoveUntil(
         (context),
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => HomePage()),
         (route) => false);
   }
 }

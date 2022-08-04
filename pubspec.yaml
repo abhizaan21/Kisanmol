@@ -98,6 +98,11 @@ flutter:
       - assets/images/cabbage.jpeg
       - assets/images/avocado.jpeg
       - assets/images/garlic.jpeg
+      - assets/images/tomato.jpg
+      - assets/images/grape.jpg
+      - assets/images/orange.jpg
+      - assets/images/titleImg.png
+
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
