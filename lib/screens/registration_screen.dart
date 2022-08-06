@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kisanmol_app/models/users.dart';
+import 'package:kisanmol_app/models/user_model.dart';
 import 'package:kisanmol_app/screens/home_screen.dart';
 import 'package:kisanmol_app/screens/login_screen.dart';
 import 'package:kisanmol_app/services/auth_service.dart';
@@ -17,23 +17,37 @@ class RegistrationScreen extends StatefulWidget {
   State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
+
+
 class _RegistrationScreenState extends State<RegistrationScreen> {
   firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
   //form key
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController firstNameEditingController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController secondNameEditingController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController emailEditingController = TextEditingController();
   final TextEditingController passwordEditingController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController confirmPasswordEditingController =
-      TextEditingController();
+  TextEditingController();
   bool circular = false;
   bool isPasswordVisible = false;
 
+  void validate(){
+    if (_formKey.currentState!.validate()){
+      if (kDebugMode) {
+        print("Validated");
+      }
+    }
+    else{
+      if (kDebugMode) {
+        print("Not validated");
+      }
+    }
+  }
   @override
   Widget build(BuildContext context) {
     //Start of the creation of the field for different input type
@@ -50,8 +64,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         }
         if (!regex.hasMatch(value)) {
           return ("Please enter a valid name min of 3 character");
+        }else {
+          return null;
         }
-        return null;
       },
       onSaved: (value) {
         firstNameEditingController.text = value!;
@@ -102,8 +117,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         //Email validator
         if (!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]").hasMatch(value)) {
           return ("please enter a valid email[ex: example@gmail.com]");
+        }else {
+          return null;
         }
-        return null;
       },
       onSaved: (value) {
         emailEditingController.text = value!;
@@ -133,9 +149,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         }
         if (!regex.hasMatch(value)) {
           return ("Please enter a valid password min of 6 character");
+        }else {
+          return null;
         }
-
-        return null;
       },
       onSaved: (value) {
         passwordEditingController.text = value!;
@@ -143,7 +159,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
         prefixIcon:
-            const Icon(Icons.lock_sharp, color: Colors.deepOrangeAccent),
+        const Icon(Icons.lock_sharp, color: Colors.deepOrangeAccent),
         suffixIcon: IconButton(
           icon: isPasswordVisible
               ? const Icon(Icons.visibility_off, color: Colors.deepOrangeAccent)
@@ -168,8 +184,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         if (confirmPasswordEditingController.text !=
             passwordEditingController.text) {
           return "Password doesn't match";
+        }else {
+          return null;
         }
-        return null;
       },
       onSaved: (value) {
         confirmPasswordEditingController.text = value!;
@@ -205,14 +222,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white, fontSize: 16)),
             onPressed: () async {
+              validate();
               setState(() {
                 circular = true;
               });
               try {
                 firebase_auth.UserCredential userCredential =
-                    await firebaseAuth.createUserWithEmailAndPassword(
-                        email: emailEditingController.text,
-                        password: passwordEditingController.text);
+                await firebaseAuth.createUserWithEmailAndPassword(
+                    email: emailEditingController.text,
+                    password: passwordEditingController.text);
                 AuthService(firebase_auth.FirebaseAuth.instance).storeTokenAndData(userCredential);
                 Fluttertoast.showToast(msg: "Account created successfully !");
                 if (kDebugMode) {
@@ -223,8 +241,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 });
                 Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (builder) =>  HomePage()),
-                    (route) => false);
+                    MaterialPageRoute(builder: (builder) =>  const HomePage()),
+                        (route) => false);
               } catch (e) {
                 final snackbar = SnackBar(content: Text(e.toString()));
                 ScaffoldMessenger.of(context).showSnackBar(snackbar);
@@ -329,7 +347,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          const LoginScreen()));
+                                      const LoginScreen()));
                             },
                             child: const Text(
                               "Login",
@@ -351,7 +369,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   postDetailsToServer() async {
-    //calling our users.dart for storing the data
+    //calling our user_model.dart for storing the data
 
     //calling our firestore
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
@@ -373,7 +391,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
     Navigator.pushAndRemoveUntil(
         (context),
-        MaterialPageRoute(builder: (context) => HomePage()),
-        (route) => false);
+        MaterialPageRoute(builder: (context) => const HomePage()),
+            (route) => false);
   }
 }

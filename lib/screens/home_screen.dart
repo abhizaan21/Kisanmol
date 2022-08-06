@@ -1,11 +1,35 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kisanmol_app/models/user_model.dart';
 import 'package:kisanmol_app/roles/buyer_screen.dart';
 import 'package:kisanmol_app/widgets/constants.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   static String id = 'homepage';
   const HomePage({Key? key}) : super(key: key);
+
+  @override
+  _HomePageState createState()=> _HomePageState();}
+
+class _HomePageState extends State<HomePage>{
+
+  User? user=FirebaseAuth.instance.currentUser;
+  UserModel loggedInUser=UserModel();
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(user!.uid)
+        .get()
+        .then((value) {
+      loggedInUser = UserModel.fromMap(value.data());
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

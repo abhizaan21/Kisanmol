@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kisanmol_app/widgets/menu_drawer_widget.dart';
 import '../screens/daily_fresh.dart';
 import '../screens/fresh_crops.dart';
 import '../screens/recommended.dart';
@@ -16,18 +17,11 @@ class BuyerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const MenuDropWidget(),
       appBar: AppBar(
+        iconTheme: const IconThemeData(color: kBackgroundColor),
         elevation: 0.0,
         backgroundColor: Colors.transparent,
-        leading: IconButton(
-            onPressed: () {
-              ///Add menu drop down function
-            },
-            icon: const Icon(
-              Icons.menu,
-              size: 25,
-              color: Colors.deepOrangeAccent,
-            )),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: appPadding),

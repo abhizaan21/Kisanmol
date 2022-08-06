@@ -26,6 +26,19 @@ class _LoginScreenState extends State<LoginScreen> {
   //Firebase auth
   firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
 
+  void validate(){
+    if (_formKey.currentState!.validate()){
+      if (kDebugMode) {
+        print("Validated");
+      }
+    }
+    else{
+      if (kDebugMode) {
+        print("Not validated");
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final emailField = TextFormField(
@@ -105,17 +118,18 @@ class _LoginScreenState extends State<LoginScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white, fontSize: 16)),
           onPressed: () async {
+            validate();
             try {
-              firebase_auth.UserCredential userCredential =
-                  await firebaseAuth.signInWithEmailAndPassword(
+              firebase_auth.UserCredential userCredential = await firebaseAuth
+                  .signInWithEmailAndPassword(
                       email: emailController.text,
                       password: passwordController.text);
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (builder) => const HomePage()),
+                      (route) => false);
               AuthService(firebase_auth.FirebaseAuth.instance)
                   .storeTokenAndData(userCredential);
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (builder) =>  const HomePage()),
-                      (route) => false);
               const snackBar =
                   SnackBar(content: Text("Logged In Successfully"));
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -149,7 +163,11 @@ class _LoginScreenState extends State<LoginScreen> {
               style: TextStyle(color: Colors.black54, fontSize: 16)),
           onPressed: () {
             AuthService(firebase_auth.FirebaseAuth.instance)
-                .googleSignIn(context);
+                .googleSignIn(context)
+                .whenComplete(() => Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (builder) => const HomePage()),
+                    (route) => false));
           },
           icon: const FaIcon(
             FontAwesomeIcons.google,
@@ -171,7 +189,11 @@ class _LoginScreenState extends State<LoginScreen> {
             style: TextStyle(color: Colors.white, fontSize: 16)),
         onPressed: () {
           AuthService(firebase_auth.FirebaseAuth.instance)
-              .signInWithFacebook(context);
+              .signInWithFacebook(context)
+              .whenComplete(() => Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (builder) => const HomePage()),
+                  (route) => false));
         },
         icon: const FaIcon(
           FontAwesomeIcons.facebook,
@@ -203,7 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 SizedBox(
-                    height: 200, child: Image.asset('assets/images/Logo.png')),
+                    height: 180, child: Image.asset('assets/images/Logo.png')),
                 const SizedBox(
                   height: 40,
                 ),
@@ -225,16 +247,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       fontSize: 20,
                       fontWeight: FontWeight.normal,
                       color: Colors.black54),
+                ),const SizedBox(
+                  height: 15,
                 ),
-                const SizedBox(height: 15.0),
                 googleSignInButton,
                 const SizedBox(
-                  height: 15,
+                  height: 10,
                 ),
                 facebookLoginButton,
-                const SizedBox(
-                  height: 15,
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,

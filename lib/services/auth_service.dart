@@ -27,19 +27,19 @@ class AuthService {
     try {
       GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
       GoogleSignInAuthentication? googleSignInAuthentication =
-          await googleSignInAccount?.authentication;
+      await googleSignInAccount?.authentication;
       AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleSignInAuthentication?.accessToken,
         idToken: googleSignInAuthentication?.idToken,
       );
       if (googleSignInAccount != null) {
         UserCredential userCredential =
-            await _auth.signInWithCredential(credential);
+        await _auth.signInWithCredential(credential);
         storeTokenAndData(userCredential);
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (builder) => const HomePage()),
-            (route) => false);
+                (route) => false);
 
         const snackBar = SnackBar(content: Text("Logged In Successfully"));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -61,14 +61,14 @@ class AuthService {
       switch (result.status) {
         case LoginStatus.success:
           final AuthCredential facebookCredential =
-              FacebookAuthProvider.credential(result.accessToken!.token);
+          FacebookAuthProvider.credential(result.accessToken!.token);
           final userCredential =
-              await _auth.signInWithCredential(facebookCredential);
+          await _auth.signInWithCredential(facebookCredential);
           storeTokenAndData(userCredential);
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (builder) => const HomePage()),
-              (route) => false);
+                  (route) => false);
           return Resource(status: Status.success);
         case LoginStatus.cancelled:
           return Resource(status: Status.cancelled);
@@ -91,7 +91,7 @@ class AuthService {
       Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (builder) => const LoginScreen()),
-          (route) => false);
+              (route) => false);
 
       const snackBar = SnackBar(content: Text("Logged Out"));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
