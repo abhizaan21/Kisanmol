@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:kisanmol_app/pages/purchase_page.dart';
 import 'package:kisanmol_app/pages/user_profile.dart';
 import 'package:kisanmol_app/widgets/constants.dart';
-
 import '../models/user_model.dart';
 import '../pages/favourite_page.dart';
+import '../services/auth_service.dart';
 
 class MenuDropWidget extends StatefulWidget {
   final padding = const EdgeInsets.symmetric(horizontal: 20);
@@ -33,6 +33,7 @@ class _MenuDropWidgetState extends State<MenuDropWidget> {
       setState(() {});
     });
   }
+
   @override
   Widget build(BuildContext context) {
     const urlImage =
@@ -45,16 +46,16 @@ class _MenuDropWidgetState extends State<MenuDropWidget> {
           children: <Widget>[
             buildHeader(
               urlImage: urlImage,
-              name:("${loggedInUser.firstName} ${loggedInUser.secondName}").toString(),
+              name: ("${loggedInUser.firstName}${loggedInUser.secondName}")
+                  .toString(),
               email: ("${loggedInUser.email}").toString(),
-              onClicked: () =>
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) =>
-                     ProfilePage(
-                      name: ("${loggedInUser.firstName} ${loggedInUser.secondName}").toString(),
-                      urlImage: urlImage,
-                    ),
-                  )),
+              onClicked: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => ProfilePage(
+                  name: ("${loggedInUser.firstName} ${loggedInUser.secondName}")
+                      .toString(),
+                  urlImage: urlImage,
+                ),
+              )),
             ),
             Column(
               children: [
@@ -74,7 +75,7 @@ class _MenuDropWidgetState extends State<MenuDropWidget> {
                 ),
                 const SizedBox(height: 16),
                 buildMenuItem(
-                  text: 'Purchases',
+                  text: 'List of sale',
                   icon: Icons.shopping_basket,
                   onClicked: () => selectedItem(context, 2),
                 ),
@@ -94,10 +95,12 @@ class _MenuDropWidgetState extends State<MenuDropWidget> {
                 ),
                 const SizedBox(height: 16),
                 buildMenuItem(
-                  text: 'Notifications',
-                  icon: Icons.notifications_outlined,
-                  onClicked: () => selectedItem(context, 5),
-                ),
+                  text: 'SignOut',
+                  icon: Icons.logout,
+                  onClicked: () {
+                    AuthService().signOut(context);
+                  },
+                )
               ],
             ),
           ],
@@ -106,95 +109,97 @@ class _MenuDropWidgetState extends State<MenuDropWidget> {
     );
   }
 }
-  Widget buildHeader({
-    required String urlImage,
-    required String name,
-    required String email,
-    required VoidCallback onClicked,
-  }) =>
-      InkWell(
-        onTap: onClicked,
-        child: Row(
-          children: [
-            CircleAvatar(radius: 30, backgroundImage: NetworkImage(urlImage)),
-            const SizedBox(width: 20),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: const TextStyle(fontSize: 20, color: Colors.white),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  email,
-                  style: const TextStyle(fontSize: 14, color: Colors.white),
-                ),
-              ],
-            ),
-            const Spacer(),
-            const CircleAvatar(
-              radius: 24,
-              backgroundColor: kPrimaryColor,
-              child: Icon(Icons.add_comment_outlined, color: Colors.deepOrangeAccent),
-            )
-          ],
-        ),
-      );
 
-  Widget buildSearchField() {
-    const color = Colors.white;
-
-    return TextField(
-      style: const TextStyle(color: color),
-      decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        hintText: 'Search',
-        hintStyle: const TextStyle(color: color),
-        prefixIcon: const Icon(Icons.search, color: color),
-        filled: true,
-        fillColor: Colors.white12,
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
-          borderSide: BorderSide(color: color.withOpacity(0.7)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
-          borderSide: BorderSide(color: color.withOpacity(0.7)),
-        ),
+Widget buildHeader({
+  required String urlImage,
+  required String name,
+  required String email,
+  required VoidCallback onClicked,
+}) =>
+    InkWell(
+      onTap: onClicked,
+      child: Row(
+        children: [
+          CircleAvatar(radius: 30, backgroundImage: NetworkImage(urlImage)),
+          const SizedBox(width: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                style: const TextStyle(fontSize: 20, color: Colors.white),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                email,
+                style: const TextStyle(fontSize: 14, color: Colors.white),
+              ),
+            ],
+          ),
+          const Spacer(),
+          const CircleAvatar(
+            radius: 24,
+            backgroundColor: kPrimaryColor,
+            child: Icon(Icons.add_comment_outlined,
+                color: Colors.deepOrangeAccent),
+          )
+        ],
       ),
     );
+
+Widget buildSearchField() {
+  const color = Colors.white;
+
+  return TextField(
+    style: const TextStyle(color: color),
+    decoration: InputDecoration(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      hintText: 'Search',
+      hintStyle: const TextStyle(color: color),
+      prefixIcon: const Icon(Icons.search, color: color),
+      filled: true,
+      fillColor: Colors.white12,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(5),
+        borderSide: BorderSide(color: color.withOpacity(0.7)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(5),
+        borderSide: BorderSide(color: color.withOpacity(0.7)),
+      ),
+    ),
+  );
+}
+
+Widget buildMenuItem({
+  required String text,
+  required IconData icon,
+  VoidCallback? onClicked,
+}) {
+  const color = Colors.white;
+  const hoverColor = Colors.white70;
+
+  return ListTile(
+    leading: Icon(icon, color: color),
+    title: Text(text, style: const TextStyle(color: color)),
+    hoverColor: hoverColor,
+    onTap: onClicked,
+  );
+}
+
+void selectedItem(BuildContext context, int index) {
+  Navigator.of(context).pop();
+
+  switch (index) {
+    case 0:
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => const PurchasePage(),
+      ));
+      break;
+    case 1:
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => const FavouritePage(),
+      ));
+      break;
   }
-
-  Widget buildMenuItem({
-    required String text,
-    required IconData icon,
-    VoidCallback? onClicked,
-  }) {
-    const color = Colors.white;
-    const hoverColor = Colors.white70;
-
-    return ListTile(
-      leading: Icon(icon, color: color),
-      title: Text(text, style: const TextStyle(color: color)),
-      hoverColor: hoverColor,
-      onTap: onClicked,
-    );
-  }
-
-  void selectedItem(BuildContext context, int index) {
-    Navigator.of(context).pop();
-
-    switch (index) {
-      case 0:
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const PurchasePage(),
-        ));
-        break;
-      case 1:
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const FavouritePage(),
-        ));
-        break;
-    }
-  }
+}

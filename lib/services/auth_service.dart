@@ -10,20 +10,72 @@ import 'package:kisanmol_app/screens/login_screen.dart';
 import '../utils/resource.dart';
 
 class AuthService {
-  final FirebaseAuth _auth;
-  AuthService(this._auth);
-
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: [
-      'email',
-      'https://www.googleapis.com/auth/contacts.readonly',
-    ],
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: [
+    'email',
+    'https://www.googleapis.com/auth/contacts.readonly',
+  ],
   );
-
-  Stream<User?> get authStateChanges => FirebaseAuth.instance.idTokenChanges();
-
   final storage = const FlutterSecureStorage();
-  Future<void> googleSignIn(BuildContext context) async {
+  Stream<User?> get authStateChanges => _firebaseAuth.idTokenChanges();
+  Stream<String?> get onAuthStateChanged => _firebaseAuth.authStateChanges().map(
+      (User? user)=> user?.uid);
+
+  // GET UID
+  Future<String?> getCurrentUID() async {
+    return (_firebaseAuth.currentUser)?.uid;
+  }
+
+  // Email & Password Sign Up
+  Future<User?> signUp(
+      String email, String password, BuildContext context) async {
+    try {
+      UserCredential result = await _firebaseAuth.createUserWithEmailAndPassword(
+          email: email, password: email);
+      User? user = result.user;
+      return Future.value(user);
+      // return Future.value(true);
+    } catch (e) {
+      if (kDebugMode) {
+        print("Sign up failed");
+      }
+      final snackBar = SnackBar(content: Text(e.toString()));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+    return Future.value(null);
+  }
+  // Email & Password Sign In
+  Future<String?> signInWithEmailAndPassword(
+      String email, String password) async {
+    return (await _firebaseAuth.signInWithEmailAndPassword(
+            email: email, password: password))
+        .user
+        ?.uid;
+  }
+
+  Future convertUserWithEmail(
+      String email, String password, String name) async {
+    final currentUser = _firebaseAuth.currentUser!;
+
+    final credential =
+        EmailAuthProvider.credential(email: email, password: password);
+    await currentUser.linkWithCredential(credential);
+  }
+
+  Future convertWithGoogle() async {
+    final currentUser = _firebaseAuth.currentUser!;
+    final GoogleSignInAccount? account = await _googleSignIn.signIn();
+    final GoogleSignInAuthentication? _googleAuth =
+        await account?.authentication;
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      idToken: _googleAuth?.idToken,
+      accessToken: _googleAuth?.accessToken,
+    );
+    await currentUser.linkWithCredential(credential);
+  }
+
+  // GOOGLE
+  Future<void> signInWithGoogle(BuildContext context) async {
     try {
       GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
       GoogleSignInAuthentication? googleSignInAuthentication =
@@ -34,7 +86,7 @@ class AuthService {
       );
       if (googleSignInAccount != null) {
         UserCredential userCredential =
-        await _auth.signInWithCredential(credential);
+        await _firebaseAuth.signInWithCredential(credential);
         storeTokenAndData(userCredential);
         Navigator.pushAndRemoveUntil(
             context,
@@ -53,22 +105,20 @@ class AuthService {
     }
   }
 
-
-
   Future<Resource?> signInWithFacebook(BuildContext context) async {
     try {
       final LoginResult result = await FacebookAuth.instance.login();
       switch (result.status) {
         case LoginStatus.success:
           final AuthCredential facebookCredential =
-          FacebookAuthProvider.credential(result.accessToken!.token);
+              FacebookAuthProvider.credential(result.accessToken!.token);
           final userCredential =
-          await _auth.signInWithCredential(facebookCredential);
+              await _firebaseAuth.signInWithCredential(facebookCredential);
           storeTokenAndData(userCredential);
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (builder) => const HomePage()),
-                  (route) => false);
+              (route) => false);
           return Resource(status: Status.success);
         case LoginStatus.cancelled:
           return Resource(status: Status.cancelled);
@@ -86,12 +136,12 @@ class AuthService {
     try {
       FirebaseAuth.instance.signOut();
       await _googleSignIn.signOut();
-      await _auth.signOut();
+      await _firebaseAuth.signOut();
       await storage.delete(key: "token");
       Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (builder) => const LoginScreen()),
-              (route) => false);
+          (route) => false);
 
       const snackBar = SnackBar(content: Text("Logged Out"));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);

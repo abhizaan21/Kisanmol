@@ -17,37 +17,36 @@ class RegistrationScreen extends StatefulWidget {
   State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
-
-
 class _RegistrationScreenState extends State<RegistrationScreen> {
   firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
   //form key
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController firstNameEditingController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController secondNameEditingController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController emailEditingController = TextEditingController();
   final TextEditingController passwordEditingController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController confirmPasswordEditingController =
-  TextEditingController();
+      TextEditingController();
   bool circular = false;
   bool isPasswordVisible = false;
+  final _firebaseAuth = FirebaseAuth.instance;
 
-  void validate(){
-    if (_formKey.currentState!.validate()){
+  void validate() {
+    if (_formKey.currentState!.validate()) {
       if (kDebugMode) {
         print("Validated");
       }
-    }
-    else{
+    } else {
       if (kDebugMode) {
         print("Not validated");
       }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     //Start of the creation of the field for different input type
@@ -64,7 +63,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         }
         if (!regex.hasMatch(value)) {
           return ("Please enter a valid name min of 3 character");
-        }else {
+        } else {
           return null;
         }
       },
@@ -117,7 +116,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         //Email validator
         if (!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]").hasMatch(value)) {
           return ("please enter a valid email[ex: example@gmail.com]");
-        }else {
+        } else {
           return null;
         }
       },
@@ -149,7 +148,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         }
         if (!regex.hasMatch(value)) {
           return ("Please enter a valid password min of 6 character");
-        }else {
+        } else {
           return null;
         }
       },
@@ -159,7 +158,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
         prefixIcon:
-        const Icon(Icons.lock_sharp, color: Colors.deepOrangeAccent),
+            const Icon(Icons.lock_sharp, color: Colors.deepOrangeAccent),
         suffixIcon: IconButton(
           icon: isPasswordVisible
               ? const Icon(Icons.visibility_off, color: Colors.deepOrangeAccent)
@@ -178,13 +177,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     final confirmPasswordField = TextFormField(
       obscureText: !isPasswordVisible,
       controller: confirmPasswordEditingController,
-
       //password match validator
       validator: (value) {
         if (confirmPasswordEditingController.text !=
             passwordEditingController.text) {
           return "Password doesn't match";
-        }else {
+        } else {
           return null;
         }
       },
@@ -222,35 +220,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white, fontSize: 16)),
             onPressed: () async {
-              validate();
-              setState(() {
-                circular = true;
-              });
-              try {
-                firebase_auth.UserCredential userCredential =
-                await firebaseAuth.createUserWithEmailAndPassword(
-                    email: emailEditingController.text,
-                    password: passwordEditingController.text);
-                AuthService(firebase_auth.FirebaseAuth.instance).storeTokenAndData(userCredential);
-                Fluttertoast.showToast(msg: "Account created successfully !");
-                if (kDebugMode) {
-                  print("Error occurred while registering");
-                }
-                setState(() {
-                  circular = false;
-                });
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (builder) =>  const HomePage()),
-                        (route) => false);
-              } catch (e) {
-                final snackbar = SnackBar(content: Text(e.toString()));
-                ScaffoldMessenger.of(context).showSnackBar(snackbar);
-                setState(() {
-                  circular = false;
-                });
-              }
-            }));
+              if (_formKey.currentState!.validate()){
+                _formKey.currentState?.save();
+              AuthService()
+                  .signUp(emailEditingController.text,
+                      passwordEditingController.text, context)
+                  .whenComplete(() => postDetailsToServer());
+            } }));
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -265,7 +241,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         backgroundColor: Colors.transparent,
         leading: IconButton(
             onPressed: () {
-              Navigator.pushReplacement(context,
+              Navigator.pop(context,
                   MaterialPageRoute(builder: (context) => const LoginScreen()));
             },
             icon: const Icon(
@@ -343,16 +319,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         ),
                         GestureDetector(
                             onTap: () {
-                              Navigator.push(
+                              Navigator.pop(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                      const LoginScreen()));
+                                          const LoginScreen()));
                             },
                             child: const Text(
                               "Login",
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 15,
                                 color: Colors.deepOrange,
                               ),
                             ))
@@ -369,29 +345,27 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   postDetailsToServer() async {
-    //calling our user_model.dart for storing the data
-
     //calling our firestore
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    User? user = firebase_auth.UserCredential as firebase_auth.User?;
-
+    User? user = _firebaseAuth.currentUser;
     //calling our user model for storing the data
     UserModel userModel = UserModel();
 
-    userModel.email = user!.email;
-    userModel.uid = user.uid;
+    userModel.email = user?.email;
+    userModel.uid = user?.uid;
     userModel.firstName = firstNameEditingController.text;
     userModel.secondName = secondNameEditingController.text;
 
     //storing the user data to the server
     await firebaseFirestore
         .collection('users')
-        .doc(user.uid)
+        .doc(user?.uid)
         .set(userModel.toMap());
+    Fluttertoast.showToast(msg: "Account created successfully !");
 
     Navigator.pushAndRemoveUntil(
         (context),
         MaterialPageRoute(builder: (context) => const HomePage()),
-            (route) => false);
+        (route) => false);
   }
 }

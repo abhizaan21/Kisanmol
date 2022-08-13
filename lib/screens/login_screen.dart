@@ -26,13 +26,12 @@ class _LoginScreenState extends State<LoginScreen> {
   //Firebase auth
   firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
 
-  void validate(){
-    if (_formKey.currentState!.validate()){
+  void validate() {
+    if (_formKey.currentState!.validate()) {
       if (kDebugMode) {
         print("Validated");
       }
-    }
-    else{
+    } else {
       if (kDebugMode) {
         print("Not validated");
       }
@@ -119,33 +118,13 @@ class _LoginScreenState extends State<LoginScreen> {
               style: TextStyle(color: Colors.white, fontSize: 16)),
           onPressed: () async {
             validate();
-            try {
-              firebase_auth.UserCredential userCredential = await firebaseAuth
-                  .signInWithEmailAndPassword(
-                      email: emailController.text,
-                      password: passwordController.text);
-                  Navigator.pushAndRemoveUntil(
+            AuthService()
+                .signInWithEmailAndPassword(
+                    emailController.text, passwordController.text)
+                .whenComplete(() => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (builder) => const HomePage()),
-                      (route) => false);
-              AuthService(firebase_auth.FirebaseAuth.instance)
-                  .storeTokenAndData(userCredential);
-              const snackBar =
-                  SnackBar(content: Text("Logged In Successfully"));
-              ScaffoldMessenger.of(context).showSnackBar(snackBar);
-              if (kDebugMode) {
-                print("logged In failed");
-              }
-              setState(() {
-                circular = false;
-              });
-            } catch (e) {
-              final snackbar = SnackBar(content: Text(e.toString()));
-              ScaffoldMessenger.of(context).showSnackBar(snackbar);
-              setState(() {
-                circular = false;
-              });
-            }
+                    ));
           }),
     );
 
@@ -155,19 +134,18 @@ class _LoginScreenState extends State<LoginScreen> {
       child: ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
               primary: Colors.white,
-              minimumSize: const Size(double.infinity, 48),
+              minimumSize: const Size(double.infinity, 48.0),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(25.0))),
           label: const Text('Continue with Google',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.black54, fontSize: 16)),
           onPressed: () {
-            AuthService(firebase_auth.FirebaseAuth.instance)
-                .googleSignIn(context)
-                .whenComplete(() => Navigator.pushAndRemoveUntil(
+            AuthService().signInWithGoogle(context).whenComplete(() =>
+                Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(builder: (builder) => const HomePage()),
-                    (route) => false));
+                    (route) => true));
           },
           icon: const FaIcon(
             FontAwesomeIcons.google,
@@ -181,16 +159,15 @@ class _LoginScreenState extends State<LoginScreen> {
       child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
             primary: Colors.blueAccent,
-            minimumSize: const Size(double.infinity, 48),
+            minimumSize: const Size(double.infinity, 48.0),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25.0))),
         label: const Text('Continue with Facebook',
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.white, fontSize: 16)),
         onPressed: () {
-          AuthService(firebase_auth.FirebaseAuth.instance)
-              .signInWithFacebook(context)
-              .whenComplete(() => Navigator.pushAndRemoveUntil(
+          AuthService().signInWithFacebook(context).whenComplete(() =>
+              Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (builder) => const HomePage()),
                   (route) => false));
@@ -225,7 +202,7 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 SizedBox(
-                    height: 180, child: Image.asset('assets/images/Logo.png')),
+                    height: 180, child: Image.asset('assets/images/logo.png')),
                 const SizedBox(
                   height: 40,
                 ),
@@ -247,7 +224,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       fontSize: 20,
                       fontWeight: FontWeight.normal,
                       color: Colors.black54),
-                ),const SizedBox(
+                ),
+                const SizedBox(
                   height: 15,
                 ),
                 googleSignInButton,
@@ -255,6 +233,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 10,
                 ),
                 facebookLoginButton,
+                const SizedBox(
+                  height: 10,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -265,17 +246,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     GestureDetector(
                         onTap: () {
-                          Navigator.pushAndRemoveUntil(
+                          Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (builder) =>
-                                      const RegistrationScreen()),
-                              (route) => false);
+                                      const RegistrationScreen()));
                         },
                         child: const Text(
                           "Register",
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 15,
                             color: Colors.deepOrange,
                           ),
                         )),

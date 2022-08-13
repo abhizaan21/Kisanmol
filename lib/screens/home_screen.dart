@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kisanmol_app/models/user_model.dart';
 import 'package:kisanmol_app/roles/buyer_screen.dart';
+import 'package:kisanmol_app/roles/seller_screen.dart';
 import 'package:kisanmol_app/widgets/constants.dart';
 
 class HomePage extends StatefulWidget {
@@ -59,7 +60,10 @@ class _HomePageState extends State<HomePage>{
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white, fontSize: 16)),
           onPressed: () {
-            /// Naviagte to seller Page
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (builder) => const SellerPage()),
+                    (route) => false);
           }),
     );
 

@@ -27,7 +27,7 @@ class BuyerPage extends StatelessWidget {
             padding: const EdgeInsets.only(right: appPadding),
             child: IconButton(
                 onPressed: () {
-                  AuthService(firebase_auth.FirebaseAuth.instance)
+                  AuthService()
                       .signOut(context);
                 },
                 icon: const Icon(
