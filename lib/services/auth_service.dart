@@ -1,25 +1,23 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kisanmol_app/screens/home_screen.dart';
-import 'package:kisanmol_app/screens/login_screen.dart';
-
 import '../utils/resource.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: [
-    'email',
-    'https://www.googleapis.com/auth/contacts.readonly',
-  ],
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: [
+      'email'
+    ],
   );
   final storage = const FlutterSecureStorage();
   Stream<User?> get authStateChanges => _firebaseAuth.idTokenChanges();
-  Stream<String?> get onAuthStateChanged => _firebaseAuth.authStateChanges().map(
-      (User? user)=> user?.uid);
+  Stream<String?> get onAuthStateChanged =>
+      _firebaseAuth.authStateChanges().map((User? user) => user?.uid);
 
   // GET UID
   Future<String?> getCurrentUID() async {
@@ -30,11 +28,10 @@ class AuthService {
   Future<User?> signUp(
       String email, String password, BuildContext context) async {
     try {
-      UserCredential result = await _firebaseAuth.createUserWithEmailAndPassword(
-          email: email, password: email);
+      UserCredential result = await _firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
       User? user = result.user;
       return Future.value(user);
-      // return Future.value(true);
     } catch (e) {
       if (kDebugMode) {
         print("Sign up failed");
@@ -44,6 +41,7 @@ class AuthService {
     }
     return Future.value(null);
   }
+
   // Email & Password Sign In
   Future<String?> signInWithEmailAndPassword(
       String email, String password) async {
@@ -65,11 +63,11 @@ class AuthService {
   Future convertWithGoogle() async {
     final currentUser = _firebaseAuth.currentUser!;
     final GoogleSignInAccount? account = await _googleSignIn.signIn();
-    final GoogleSignInAuthentication? _googleAuth =
+    final GoogleSignInAuthentication? googleAuth =
         await account?.authentication;
     final AuthCredential credential = GoogleAuthProvider.credential(
-      idToken: _googleAuth?.idToken,
-      accessToken: _googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+      accessToken: googleAuth?.accessToken,
     );
     await currentUser.linkWithCredential(credential);
   }
@@ -77,24 +75,35 @@ class AuthService {
   // GOOGLE
   Future<void> signInWithGoogle(BuildContext context) async {
     try {
-      GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
-      GoogleSignInAuthentication? googleSignInAuthentication =
-      await googleSignInAccount?.authentication;
-      AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleSignInAuthentication?.accessToken,
-        idToken: googleSignInAuthentication?.idToken,
-      );
-      if (googleSignInAccount != null) {
-        UserCredential userCredential =
-        await _firebaseAuth.signInWithCredential(credential);
-        storeTokenAndData(userCredential);
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (builder) => const HomePage()),
-                (route) => false);
+      final GoogleSignInAccount? googleSignInAccount =
+          await _googleSignIn.signIn();
 
-        const snackBar = SnackBar(content: Text("Logged In Successfully"));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      final GoogleSignInAuthentication? googleSignInAuthentication =
+          await googleSignInAccount?.authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleSignInAuthentication?.accessToken,
+          idToken: googleSignInAuthentication?.idToken);
+
+      UserCredential userCredential =
+          await _firebaseAuth.signInWithCredential(credential);
+      User user = _firebaseAuth.currentUser!;
+      if (kDebugMode) {
+        print(user.uid);
+      }
+      storeTokenAndData(userCredential);
+      CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
+      final checkUsers = await users.doc(googleSignInAccount?.id).get();
+      if (checkUsers.exists) {
+        users.doc(googleSignInAccount?.id).set({
+          'uid': userCredential.user?.uid,
+          'name': googleSignInAccount?.displayName,
+          'email': googleSignInAccount?.email,
+          'photo': googleSignInAccount?.photoUrl,
+          'createdAt': userCredential.user?.metadata.creationTime.toString(),
+          'lastLogin': userCredential.user?.metadata.lastSignInTime.toString(),
+        });
       }
     } catch (e) {
       if (kDebugMode) {
@@ -115,10 +124,6 @@ class AuthService {
           final userCredential =
               await _firebaseAuth.signInWithCredential(facebookCredential);
           storeTokenAndData(userCredential);
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (builder) => const HomePage()),
-              (route) => false);
           return Resource(status: Status.success);
         case LoginStatus.cancelled:
           return Resource(status: Status.cancelled);
@@ -138,13 +143,6 @@ class AuthService {
       await _googleSignIn.signOut();
       await _firebaseAuth.signOut();
       await storage.delete(key: "token");
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (builder) => const LoginScreen()),
-          (route) => false);
-
-      const snackBar = SnackBar(content: Text("Logged Out"));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     } catch (e) {
       const snackBar = SnackBar(content: Text("Error occurred"));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);

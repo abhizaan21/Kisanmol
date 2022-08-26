@@ -1,27 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kisanmol_app/models/user_model.dart';
-import 'package:kisanmol_app/screens/home_screen.dart';
-import 'package:kisanmol_app/screens/login_screen.dart';
 import 'package:kisanmol_app/services/auth_service.dart';
 
-class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({Key? key}) : super(key: key);
-  static String id = 'registration';
+class BuyerRegistrationScreen extends StatefulWidget {
+  const BuyerRegistrationScreen({Key? key}) : super(key: key);
+  static String id = 'buyerRegistration';
   @override
-  State<RegistrationScreen> createState() => _RegistrationScreenState();
+  State<BuyerRegistrationScreen> createState() =>
+      _BuyerRegistrationScreenState();
 }
 
-class _RegistrationScreenState extends State<RegistrationScreen> {
+class _BuyerRegistrationScreenState extends State<BuyerRegistrationScreen> {
   firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
   //form key
   final _formKey = GlobalKey<FormState>();
-
   final TextEditingController firstNameEditingController =
       TextEditingController();
   final TextEditingController secondNameEditingController =
@@ -31,9 +29,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       TextEditingController();
   final TextEditingController confirmPasswordEditingController =
       TextEditingController();
+  final TextEditingController companyNameEditingController = TextEditingController();
+
   bool circular = false;
   bool isPasswordVisible = false;
-  final _firebaseAuth = FirebaseAuth.instance;
+  final db = FirebaseFirestore.instance.collection('users');
 
   void validate() {
     if (_formKey.currentState!.validate()) {
@@ -207,6 +207,30 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       ),
     );
 
+    final companyName = TextFormField(
+      controller: companyNameEditingController,
+      keyboardType: TextInputType.text,
+      validator: (value) {
+        //field validator
+        if (value!.isEmpty) {
+          return ("This field cannot be empty");
+        } else {
+          return null;
+        }
+      },
+      onSaved: (value) {
+        companyNameEditingController.text = value!;
+      },
+      textInputAction: TextInputAction.next,
+      decoration: InputDecoration(
+        prefixIcon: const Icon(Icons.person, color: Colors.deepOrangeAccent),
+        contentPadding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
+        hintText: "Company Name",
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+        ),
+      ),
+    );
     //End of the fields creation
 
     //SignUp Button
@@ -220,13 +244,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white, fontSize: 16)),
             onPressed: () async {
-              if (_formKey.currentState!.validate()){
+              if (_formKey.currentState!.validate()) {
                 _formKey.currentState?.save();
-              AuthService()
-                  .signUp(emailEditingController.text,
-                      passwordEditingController.text, context)
-                  .whenComplete(() => postDetailsToServer());
-            } }));
+                AuthService()
+                    .signUp(emailEditingController.text,
+                        passwordEditingController.text, context)
+                    .whenComplete(() => postDetailsToServer());
+              }
+            }));
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -241,8 +266,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         backgroundColor: Colors.transparent,
         leading: IconButton(
             onPressed: () {
-              Navigator.pop(context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()));
+              Get.offNamed('/firstView');
             },
             icon: const Icon(
               Icons.arrow_back,
@@ -303,6 +327,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ),
                     confirmPasswordField,
                     const SizedBox(
+                      height: 15,
+                    ),
+                    companyName,
+                    const SizedBox(
                       height: 25,
                     ),
                     signUpButton,
@@ -319,11 +347,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         ),
                         GestureDetector(
                             onTap: () {
-                              Navigator.pop(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const LoginScreen()));
+                              Get.offNamed('/login');
                             },
                             child: const Text(
                               "Login",
@@ -346,26 +370,21 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   postDetailsToServer() async {
     //calling our firestore
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    User? user = _firebaseAuth.currentUser;
+    var uid = await AuthService().getCurrentUID();
     //calling our user model for storing the data
     UserModel userModel = UserModel();
 
-    userModel.email = user?.email;
-    userModel.uid = user?.uid;
+    userModel.email = emailEditingController.text;
+    userModel.uid = uid;
     userModel.firstName = firstNameEditingController.text;
     userModel.secondName = secondNameEditingController.text;
+    userModel.companyName=companyNameEditingController.text;
+    userModel.farmName="This user is a CropBuyer";
+    userModel.role = "Buyer";
 
-    //storing the user data to the server
-    await firebaseFirestore
-        .collection('users')
-        .doc(user?.uid)
-        .set(userModel.toMap());
     Fluttertoast.showToast(msg: "Account created successfully !");
-
-    Navigator.pushAndRemoveUntil(
-        (context),
-        MaterialPageRoute(builder: (context) => const HomePage()),
-        (route) => false);
+    //storing the user data to the server
+    await db.doc(uid).set(userModel.toJson());
+    await Get.offNamed('/login');
   }
 }

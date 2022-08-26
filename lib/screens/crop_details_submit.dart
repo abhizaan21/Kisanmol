@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kisanmol_app/models/crop_model.dart';
 import '../roles/seller_screen.dart';
 import '../services/auth_service.dart';
 
@@ -15,10 +17,8 @@ class SubmitDetail extends StatefulWidget {
 
 class _SubmitDetail extends State<SubmitDetail> {
   firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
-
   //form key
   final _formKey = GlobalKey<FormState>();
-
   final TextEditingController userNameEditingController =
       TextEditingController();
   final TextEditingController requirementEditingController =
@@ -30,8 +30,8 @@ class _SubmitDetail extends State<SubmitDetail> {
       TextEditingController();
   bool circular = false;
   bool isPasswordVisible = false;
-  final db = FirebaseFirestore.instance.collection('cropDetails');
-
+  final db = FirebaseFirestore.instance.collection('cropsData');
+  FocusNode myFocusNode = FocusNode();
   @override
   Widget build(BuildContext context) {
     //Start of the creation of the field for different input type
@@ -53,9 +53,11 @@ class _SubmitDetail extends State<SubmitDetail> {
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
         fillColor: Colors.white,
-        prefixIcon: const Icon(Icons.person, color: Colors.deepOrangeAccent),
+        prefixIcon: const Icon(Icons.person, color: Colors.white),
         contentPadding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
-        hintText: "Username",
+        labelText: "Username",
+        labelStyle: TextStyle(
+            color: myFocusNode.hasFocus ? Colors.white : Colors.white54),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(25.0),
         ),
@@ -76,10 +78,11 @@ class _SubmitDetail extends State<SubmitDetail> {
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.person, color: Colors.deepOrangeAccent),
+        prefixIcon: const Icon(Icons.add_box_rounded, color: Colors.white),
         contentPadding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
-        hintText: "Requirement",
-        labelText: "box quantity",
+        labelText: "Box quantity",
+        labelStyle: TextStyle(
+            color: myFocusNode.hasFocus ? Colors.white : Colors.white54),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(25.0),
         ),
@@ -102,9 +105,11 @@ class _SubmitDetail extends State<SubmitDetail> {
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
+        prefixIcon: const Icon(Icons.attach_money, color: Colors.white),
         contentPadding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
-        hintText: "500\$",
-        labelText: "amount per box",
+        labelText: "price per grade A box",
+        labelStyle: TextStyle(
+            color: myFocusNode.hasFocus ? Colors.white : Colors.white54),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(25.0),
         ),
@@ -126,9 +131,11 @@ class _SubmitDetail extends State<SubmitDetail> {
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
+        prefixIcon: const Icon(Icons.attach_money, color: Colors.white),
         contentPadding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
-        hintText: "250\$",
-        labelText: "amount per box",
+        labelText: "price per grade B box",
+        labelStyle: TextStyle(
+            color: myFocusNode.hasFocus ? Colors.white : Colors.white54),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(25.0),
         ),
@@ -151,41 +158,16 @@ class _SubmitDetail extends State<SubmitDetail> {
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.person, color: Colors.deepOrangeAccent),
+        prefixIcon: const Icon(Icons.nature, color: Colors.white),
         contentPadding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
-        hintText: "Type of Crop",
+        labelText: "Crop type",
+        labelStyle: TextStyle(
+            color: myFocusNode.hasFocus ? Colors.white : Colors.white54),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(25.0),
         ),
       ),
     );
-
-    final updatedField = TextFormField(
-      controller: lastUpdatedEditingController,
-      keyboardType: TextInputType.datetime,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return ("please enter the date and time");
-        } else {
-          return null;
-        }
-      },
-      onSaved: (value) {
-        lastUpdatedEditingController.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.person, color: Colors.deepOrangeAccent),
-        contentPadding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
-        hintText: "'MM/dd/yyyy'",
-        labelText: "Today's Date",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(25.0),
-        ),
-      ),
-    );
-
-    //End of the fields creation
 
     //SignUp Button
     final submitDetails = Material(
@@ -198,23 +180,11 @@ class _SubmitDetail extends State<SubmitDetail> {
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white, fontSize: 16)),
             onPressed: () async {
-              var uid = await AuthService().getCurrentUID();
-              //save cropDetails to firebase
-              Map<String, dynamic> data = {
-                'uid': uid,
-                'userName': userNameEditingController.text,
-                'requirement': requirementEditingController.text,
-                'gradeA': gradeAEditingController.text,
-                'gradeB': gradeBEditingController.text,
-                'type': typeEditingController.text,
-                'lastUpdated': lastUpdatedEditingController.text,
-              };
-               await db.add(data);
-              Fluttertoast.showToast(msg: "Crop details submitted successfully !");
-              Navigator.pushAndRemoveUntil(
-                  (context),
-                  MaterialPageRoute(builder: (context) => const SellerPage()),
-                      (route) => false);
+              if (_formKey.currentState!.validate()) {
+                _formKey.currentState?.save();
+                await postDataToCropDetails();
+                Get.offNamed("/sellerScreen");
+              }
             }));
 
     return Scaffold(
@@ -231,7 +201,7 @@ class _SubmitDetail extends State<SubmitDetail> {
         leading: IconButton(
             onPressed: () {
               Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const SellerPage()));
+                  MaterialPageRoute(builder: (context) =>  SellerPage()));
             },
             icon: const Icon(
               Icons.arrow_back,
@@ -249,7 +219,7 @@ class _SubmitDetail extends State<SubmitDetail> {
                     image: AssetImage('assets/images/homeImage1.png'),
                     fit: BoxFit.cover,
                     colorFilter: ColorFilter.mode(
-                      Colors.black12,
+                      Colors.black45,
                       BlendMode.darken,
                     ))),
             child: Padding(
@@ -292,10 +262,6 @@ class _SubmitDetail extends State<SubmitDetail> {
                     ),
                     typeField,
                     const SizedBox(
-                      height: 25,
-                    ),
-                    updatedField,
-                    const SizedBox(
                       height: 15,
                     ),
                     submitDetails,
@@ -310,5 +276,23 @@ class _SubmitDetail extends State<SubmitDetail> {
         ),
       ),
     );
+  }
+
+  postDataToCropDetails() async {
+    var uid = await AuthService().getCurrentUID();
+    // calling our Crop model
+    CropModel cropModel = CropModel(
+        uid,
+        userNameEditingController.text,
+        requirementEditingController.text,
+        gradeAEditingController.text,
+        gradeBEditingController.text,
+        typeEditingController.text,
+        DateTime.now());
+    // writing all the values
+
+    Fluttertoast.showToast(msg: "CropData submitted successfully :) ");
+    await db.doc().set(cropModel.toJson());
+
   }
 }

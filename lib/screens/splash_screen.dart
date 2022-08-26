@@ -5,16 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kisanmol_app/screens/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
-import 'package:kisanmol_app/screens/registration_screen.dart';
-import '../services/auth_service.dart';
-import 'home_screen.dart';
+import 'package:kisanmol_app/services/user_management.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
   static String id = 'splash';
 
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> {
@@ -25,14 +23,14 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(
+    user = FirebaseAuth.instance.authStateChanges().listen((user) {
+      Timer(
       const Duration(seconds: 3),
       () => Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (builder) => checkRoute()),
+        MaterialPageRoute(builder: (builder) => UserManagement().handleAuth()),
       ),
     );
-    user = FirebaseAuth.instance.authStateChanges().listen((user) {
       if (user == null) {
         if (kDebugMode) {
           print('User is currently signed out !');
@@ -43,40 +41,6 @@ class _SplashScreenState extends State<SplashScreen> {
         }
       }
     });
-    checkLogin();
-  }
-
-  @override
-  void dispose() {
-    user.cancel();
-    super.dispose();
-  }
-
-  checkLogin() async {
-    String? token = await AuthService().getToken();
-    if (kDebugMode) {
-      print(token);
-    }
-    if (token != null) {
-      setState(() {
-        currentPage = const HomePage();
-      });
-    }
-  }
-
-  checkRoute() {
-    return MaterialApp(
-      initialRoute:
-          firebaseAuth.currentUser == null ? LoginScreen.id : HomePage.id,
-
-      ///key value pair
-      routes: {
-        LoginScreen.id: (context) => const LoginScreen(),
-        RegistrationScreen.id: (context) => const RegistrationScreen(),
-        HomePage.id: (context) => const HomePage(),
-      },
-      home: currentPage,
-    );
   }
 
   @override

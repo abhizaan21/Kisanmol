@@ -1,36 +1,16 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kisanmol_app/models/user_model.dart';
-import 'package:kisanmol_app/roles/buyer_screen.dart';
-import 'package:kisanmol_app/roles/seller_screen.dart';
 import 'package:kisanmol_app/widgets/constants.dart';
 
-class HomePage extends StatefulWidget {
-  static String id = 'homepage';
-  const HomePage({Key? key}) : super(key: key);
-
+class FirstView extends StatefulWidget {
+  const FirstView({Key? key}) : super(key: key);
+  static String id = 'firstView';
   @override
-  _HomePageState createState()=> _HomePageState();}
+  State<FirstView> createState() => _FirstViewState();
+}
 
-class _HomePageState extends State<HomePage>{
-
-  User? user=FirebaseAuth.instance.currentUser;
-  UserModel loggedInUser=UserModel();
-
-  @override
-  void initState() {
-    super.initState();
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(user!.uid)
-        .get()
-        .then((value) {
-      loggedInUser = UserModel.fromMap(value.data());
-      setState(() {});
-    });
-  }
+class _FirstViewState extends State<FirstView> {
 
   @override
   Widget build(BuildContext context) {
@@ -40,14 +20,11 @@ class _HomePageState extends State<HomePage>{
       child: MaterialButton(
           padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
           minWidth: MediaQuery.of(context).size.width * 0.9,
-          child: const Text('Login as crop buyer',
+          child: const Text('Sign up as crop buyer',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white, fontSize: 16)),
           onPressed: () {
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (builder) => BuyerPage()),
-                (route) => false);
+            Get.offNamed('/buyerRegister');
           }),
     );
     final sellerLogin = Material(
@@ -56,14 +33,11 @@ class _HomePageState extends State<HomePage>{
       child: MaterialButton(
           padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
           minWidth: MediaQuery.of(context).size.width * 0.9,
-          child: const Text('Login as a crop seller',
+          child: const Text('Sign up as a crop seller',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white, fontSize: 16)),
           onPressed: () {
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (builder) => const SellerPage()),
-                    (route) => false);
+            Get.offNamed('/sellerRegister');
           }),
     );
 
@@ -97,11 +71,11 @@ class _HomePageState extends State<HomePage>{
               child: Form(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    const SizedBox(
-                      height: 21,
-                    ),
+                    SizedBox(
+                        height: 180,
+                        child: Image.asset('assets/icons/crops.png')),
                     SizedBox(
                       child: Text(
                           "Sell your goods all over india and find a best match for your crops. !",
@@ -122,6 +96,27 @@ class _HomePageState extends State<HomePage>{
                     const SizedBox(
                       height: 15,
                     ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        const Text(
+                          "Already have an account? ",
+                          style: TextStyle(fontSize: 14, color: Colors.black),
+                        ),
+                        GestureDetector(
+                            onTap: () {
+                              Get.offNamed('/login');
+                            },
+                            child: const Text(
+                              "Login",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.deepOrange,
+                              ),
+                            ))
+                      ],
+                    )
                   ],
                 ),
               ),

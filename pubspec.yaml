@@ -35,31 +35,34 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   google_fonts: ^3.0.1
-  cloud_firestore: ^3.3.0
-  firebase_core: ^1.19.2
+  cloud_firestore: ^3.4.4
+  firebase_core: ^1.20.1
   fluttertoast: ^8.0.9
   splashscreen: ^1.3.5
   carousel_pro: ^1.0.0
   date_range_picker: ^1.0.3
   flutter_spinkit: ^5.1.0
 
-
   #Google Sign In
-  firebase_auth: ^3.4.2
-  google_sign_in: ^5.4.0
+  firebase_auth: ^3.6.3
+  google_sign_in: ^5.4.1
 
   #Google Icon
   font_awesome_flutter: ^10.1.0
 
   #Facebook Sign In
-  flutter_facebook_auth: ^4.4.0+1
+  flutter_facebook_auth: ^4.4.1
 
   #State Management
   provider: ^6.0.3
-  flutter_secure_storage: ^5.0.2
+  flutter_secure_storage: ^6.0.0
   resource: ^2.1.7
   flutter_svg: ^1.0.3
   intl: ^0.17.0
+  equatable: ^2.0.3
+  form_field_validator: ^1.1.0
+  get: ^4.6.5
+  firebase_database: ^9.1.1
 
 dev_dependencies:
   flutter_test:
@@ -88,10 +91,9 @@ flutter:
       - assets/images/logo.png
       - assets/images/background1.jpg
       - assets/images/background2.jpg
-      - assets/images/homeimg1.jpg
       - assets/images/homeImage1.png
       - assets/icons/user.png
-      - assets/images/homeimage2.png
+      - assets/images/homeImage2.png
       - assets/images/mango.jpeg
       - assets/images/strawberry.jpeg
       - assets/images/watermelon.jpeg

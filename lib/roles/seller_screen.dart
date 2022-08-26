@@ -1,12 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kisanmol_app/screens/crop_details_submit.dart';
-import '../services/auth_service.dart';
+import 'package:kisanmol_app/services/auth_service.dart';
+import '../models/crop_model.dart';
 import '../widgets/constants.dart';
 import '../widgets/menu_drawer_widget.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
 class SellerPage extends StatefulWidget {
   const SellerPage({Key? key}) : super(key: key);
@@ -16,72 +15,190 @@ class SellerPage extends StatefulWidget {
 }
 
 class _SellerPageState extends State<SellerPage> {
-  final CollectionReference crops =
-      FirebaseFirestore.instance.collection('crops');
-  final firebase_auth.FirebaseAuth firebaseAuth =
-      firebase_auth.FirebaseAuth.instance;
-  User? user = FirebaseAuth.instance.currentUser;
-
-
   @override
   Widget build(BuildContext context) {
-
-    final uploadButton = ButtonTheme(
-      padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
-      child: ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-              primary: Colors.teal,
-              minimumSize: const Size(double.infinity, 48.0),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25.0))),
-          label: const Text('Add crop details',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: 16)),
-          onPressed: () { Navigator.pushAndRemoveUntil(
-              (context),
-              MaterialPageRoute(builder: (context) => const SubmitDetail()),
-                  (route) => false);},
-          icon: const FaIcon(
-            FontAwesomeIcons.upload,
-            color: Colors.white,
-          )),
-    );
-
     return Scaffold(
-      drawer: const MenuDropWidget(),
-      appBar: AppBar(
-        iconTheme: const IconThemeData(color: kBackgroundColor),
-        elevation: 0.0,
-        backgroundColor: Colors.transparent,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: appPadding),
-            child: IconButton(
-                onPressed: () {
-                  AuthService()
-                      .signOut(context);
-                },
-                icon: const Icon(
-                  Icons.logout,
-                  color: kBackgroundColor,
-                )),
-          )
+        drawer: MenuDrawerWidget(),
+        extendBodyBehindAppBar: true,
+        backgroundColor: Colors.grey.shade400,
+        appBar: AppBar(
+          centerTitle: true,
+          title:
+              const Text('Your Crops', style: TextStyle(color: Colors.white)),
+          iconTheme: const IconThemeData(color: Colors.white),
+          elevation: 0.0,
+          backgroundColor: Colors.teal.shade400,
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                  (context),
+                  MaterialPageRoute(
+                    builder: (context) => const SubmitDetail(),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+        body: Center(
+            child: StreamBuilder(
+                stream: getUsersCropsStreamSnapshots(context),
+                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (!snapshot.hasData) {
+                    if (kDebugMode) {
+                      print('Loading.....');
+                    }
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final int? cropCount = snapshot.data?.docs.length;
+                  return ListView.builder(
+                      itemCount: cropCount,
+                      itemBuilder: (BuildContext context, int index) =>
+                          buildCropCard(context, snapshot.data!.docs[index]));
+                })));
+  }
+
+  Stream<QuerySnapshot> getUsersCropsStreamSnapshots(
+      BuildContext context) async* {
+    final uid = await AuthService().getCurrentUID();
+    if (kDebugMode) {
+      print(uid);
+    }
+    yield* FirebaseFirestore.instance
+        .collection('cropsData')
+        .where('uid', isEqualTo: uid)
+        .snapshots();
+  }
+
+  Widget buildCropCard(BuildContext context, DocumentSnapshot document) {
+    final crop = CropModel.fromSnapshot(document);
+
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: black.withOpacity(0.6),
+            offset: const Offset(30.0, 30.0),
+            blurRadius: 15,
+          ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Form(
+      child: Card(
+        elevation: 30.0,
+        color: Colors.orange.shade600,
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
           child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(
-                    height: 150, child: Image.asset('assets/icons/crops.png')),
-                 const SizedBox(
-                  height: 40,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                child: Row(children: <Widget>[
+                  Text(
+                    (crop.type.toString()),
+                    style: const TextStyle(fontSize: 30.0, color: Colors.white),
+                  ),
+                  const Spacer(),
+                ]),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                child: Row(children: <Widget>[
+                  const Text('User ID:',
+                      style: TextStyle(fontSize: 15.0, color: Colors.white)),
+                  const Spacer(),
+                  Text((crop.uid.toString()),
+                      style:
+                          const TextStyle(fontSize: 15.0, color: Colors.white)),
+                ]),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                child: Row(children: <Widget>[
+                  const Text('UserName:',
+                      style: TextStyle(fontSize: 15.0, color: Colors.white)),
+                  const Spacer(),
+                  Text((crop.userName.toString().toUpperCase()),
+                      style:
+                          const TextStyle(fontSize: 15.0, color: Colors.white)),
+                ]),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                child: Row(children: <Widget>[
+                  const Text('Requirement:',
+                      style: TextStyle(fontSize: 15.0, color: Colors.white)),
+                  const Spacer(),
+                  Text(('${crop.requirement.toString()} Boxes'),
+                      style:
+                          const TextStyle(fontSize: 15.0, color: Colors.white)),
+                ]),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                child: Row(children: <Widget>[
+                  const Text('Grade A:',
+                      style: TextStyle(fontSize: 15.0, color: Colors.white)),
+                  const Spacer(),
+                  Text(('\$${crop.gradeA.toString()} /Boxes'),
+                      style:
+                          const TextStyle(fontSize: 15.0, color: Colors.white)),
+                ]),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                child: Row(children: <Widget>[
+                  const Text('Grade B:',
+                      style: TextStyle(fontSize: 15.0, color: Colors.white)),
+                  const Spacer(),
+                  Text(('\$${crop.gradeB.toString()} /Boxes'),
+                      style:
+                          const TextStyle(fontSize: 15.0, color: Colors.white)),
+                ]),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                child: Row(
+                  children: <Widget>[
+                    const Icon(
+                      Icons.date_range_outlined,
+                      color: Colors.white,
+                    ),
+                    const Spacer(),
+                    Text(crop.lastUpdated.toString(),
+                        style: const TextStyle(
+                            fontSize: 15.0, color: Colors.white))
+                  ],
                 ),
-                uploadButton,
-              ]),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: const StadiumBorder(),
+                          primary: kPrimaryColor.shade400,),
+                        onPressed: () async {
+                          await FirebaseFirestore.instance.runTransaction(
+                              (transaction) async =>
+                                  transaction.delete(document.reference));
+                        },
+                        child: const Text('Delete',
+                            style: TextStyle(
+                                fontSize: 15.0, color: Colors.white))),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
-}}
+  }
+}

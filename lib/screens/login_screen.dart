@@ -3,9 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:kisanmol_app/screens/registration_screen.dart';
+import 'package:get/get.dart';
+import 'package:kisanmol_app/models/crop_model.dart';
+import 'package:kisanmol_app/services/user_management.dart';
 import '../services/auth_service.dart';
-import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -25,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool circular = false;
   //Firebase auth
   firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
-
+  late CropModel cropData;
   void validate() {
     if (_formKey.currentState!.validate()) {
       if (kDebugMode) {
@@ -37,6 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -111,46 +113,47 @@ class _LoginScreenState extends State<LoginScreen> {
       borderRadius: BorderRadius.circular(25.0),
       color: Colors.teal,
       child: MaterialButton(
-          padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
-          minWidth: MediaQuery.of(context).size.width,
-          child: const Text('Login',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: 16)),
-          onPressed: () async {
-            validate();
-            AuthService()
-                .signInWithEmailAndPassword(
-                    emailController.text, passwordController.text)
-                .whenComplete(() => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (builder) => const HomePage()),
-                    ));
-          }),
+        padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
+        minWidth: MediaQuery.of(context).size.width,
+        child: const Text('Login',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white, fontSize: 16)),
+        onPressed: () async {
+          validate();
+          await AuthService()
+              .signInWithEmailAndPassword(
+                  emailController.text, passwordController.text)
+              .whenComplete(() async {
+            await UserManagement().authorizeAccess(context);
+          });
+        },
+      ),
     );
 
     //Google SignIn Button
     final googleSignInButton = ButtonTheme(
       padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
       child: ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-              primary: Colors.white,
-              minimumSize: const Size(double.infinity, 48.0),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25.0))),
-          label: const Text('Continue with Google',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black54, fontSize: 16)),
-          onPressed: () {
-            AuthService().signInWithGoogle(context).whenComplete(() =>
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (builder) => const HomePage()),
-                    (route) => true));
-          },
-          icon: const FaIcon(
-            FontAwesomeIcons.google,
-            color: Colors.deepOrangeAccent,
-          )),
+        style: ElevatedButton.styleFrom(
+            primary: Colors.white,
+            minimumSize: const Size(double.infinity, 48.0),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25.0))),
+        label: const Text('Continue with Google',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.black54, fontSize: 16)),
+        onPressed: () async {
+          await AuthService().signInWithGoogle(context).whenComplete(
+            () {
+              Get.offNamed('/sellerScreen');
+            },
+          );
+        },
+        icon: const FaIcon(
+          FontAwesomeIcons.google,
+          color: Colors.deepOrangeAccent,
+        ),
+      ),
     );
 
     //Facebook Login
@@ -158,19 +161,20 @@ class _LoginScreenState extends State<LoginScreen> {
       padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
       child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
-            primary: Colors.blueAccent,
-            minimumSize: const Size(double.infinity, 48.0),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25.0))),
-        label: const Text('Continue with Facebook',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white, fontSize: 16)),
+          primary: Colors.blueAccent,
+          minimumSize: const Size(double.infinity, 48.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25.0),
+          ),
+        ),
+        label: const Text(
+          'Continue with Facebook',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.white, fontSize: 16),
+        ),
         onPressed: () {
-          AuthService().signInWithFacebook(context).whenComplete(() =>
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (builder) => const HomePage()),
-                  (route) => false));
+          AuthService().signInWithFacebook(context);
+          Get.offNamed('/buyerScreen');
         },
         icon: const FaIcon(
           FontAwesomeIcons.facebook,
@@ -180,92 +184,94 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     return Scaffold(
-        body: Center(
-            child: SingleChildScrollView(
-      child: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        decoration: const BoxDecoration(
-            image: DecorationImage(
+      body: Center(
+        child: SingleChildScrollView(
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
                 image: AssetImage('assets/images/background1.jpg'),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
                   Colors.white,
                   BlendMode.darken,
-                ))),
-        child: Padding(
-          padding: const EdgeInsets.all(21.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(
-                    height: 180, child: Image.asset('assets/images/logo.png')),
-                const SizedBox(
-                  height: 40,
                 ),
-                emailField,
-                const SizedBox(
-                  height: 15,
-                ),
-                passwordField,
-                const SizedBox(
-                  height: 20,
-                ),
-                loginButton,
-                const SizedBox(
-                  height: 15,
-                ),
-                const Text(
-                  '⎯⎯⎯⎯⎯⎯⎯⎯ or⎯⎯⎯⎯⎯⎯⎯⎯',
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.normal,
-                      color: Colors.black54),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                googleSignInButton,
-                const SizedBox(
-                  height: 10,
-                ),
-                facebookLoginButton,
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(21.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    const Text(
-                      "Don't have an account? ",
-                      style: TextStyle(fontSize: 14, color: Colors.black),
+                    SizedBox(
+                        height: 180,
+                        child: Image.asset('assets/images/logo.png')),
+                    const SizedBox(
+                      height: 40,
                     ),
-                    GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (builder) =>
-                                      const RegistrationScreen()));
-                        },
-                        child: const Text(
-                          "Register",
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: Colors.deepOrange,
+                    emailField,
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    passwordField,
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    loginButton,
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    const Text(
+                      '⎯⎯⎯⎯⎯⎯⎯⎯ or⎯⎯⎯⎯⎯⎯⎯⎯',
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black54),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    googleSignInButton,
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    facebookLoginButton,
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        const Text(
+                          "Don't have an account? ",
+                          style: TextStyle(fontSize: 14, color: Colors.black),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Get.offNamed('/firstView');
+                          },
+                          child: const Text(
+                            "Register",
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.deepOrange,
+                            ),
                           ),
-                        )),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
       ),
-    )));
+    );
   }
 }
