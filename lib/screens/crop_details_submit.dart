@@ -19,7 +19,7 @@ class _SubmitDetail extends State<SubmitDetail> {
   firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
   //form key
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController userNameEditingController =
+  final TextEditingController locationEditingController =
       TextEditingController();
   final TextEditingController requirementEditingController =
       TextEditingController();
@@ -36,8 +36,8 @@ class _SubmitDetail extends State<SubmitDetail> {
   Widget build(BuildContext context) {
     //Start of the creation of the field for different input type
 
-    final userNameField = TextFormField(
-      controller: userNameEditingController,
+    final locationField = TextFormField(
+      controller: locationEditingController,
       keyboardType: TextInputType.text,
       validator: (value) {
         //Name validator
@@ -48,14 +48,14 @@ class _SubmitDetail extends State<SubmitDetail> {
         }
       },
       onSaved: (value) {
-        userNameEditingController.text = value!;
+        locationEditingController.text = value!;
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
         fillColor: Colors.white,
-        prefixIcon: const Icon(Icons.person, color: Colors.white),
+        prefixIcon: const Icon(Icons.place, color: Colors.white),
         contentPadding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
-        labelText: "Username",
+        labelText: "location",
         labelStyle: TextStyle(
             color: myFocusNode.hasFocus ? Colors.white : Colors.white54),
         border: OutlineInputBorder(
@@ -201,7 +201,7 @@ class _SubmitDetail extends State<SubmitDetail> {
         leading: IconButton(
             onPressed: () {
               Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) =>  SellerPage()));
+                  MaterialPageRoute(builder: (context) =>  const SellerPage()));
             },
             icon: const Icon(
               Icons.arrow_back,
@@ -244,7 +244,7 @@ class _SubmitDetail extends State<SubmitDetail> {
                     const SizedBox(
                       height: 30,
                     ),
-                    userNameField,
+                    locationField,
                     const SizedBox(
                       height: 15,
                     ),
@@ -283,7 +283,7 @@ class _SubmitDetail extends State<SubmitDetail> {
     // calling our Crop model
     CropModel cropModel = CropModel(
         uid,
-        userNameEditingController.text,
+        locationEditingController.text,
         requirementEditingController.text,
         gradeAEditingController.text,
         gradeBEditingController.text,

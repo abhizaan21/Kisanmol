@@ -50,17 +50,15 @@ class _SellerPageState extends State<SellerPage> {
                 stream: getUsersCropsStreamSnapshots(context),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (!snapshot.hasData) {
-                    if (kDebugMode) {
-                      print('Loading.....');
-                    }
                     return const Center(child: CircularProgressIndicator());
-                  }
+                  }else{
                   final int? cropCount = snapshot.data?.docs.length;
                   return ListView.builder(
-                      itemCount: cropCount,
-                      itemBuilder: (BuildContext context, int index) =>
-                          buildCropCard(context, snapshot.data!.docs[index]));
-                })));
+                  itemCount: cropCount??0,
+                  itemBuilder: (BuildContext context, int index) =>
+                  buildCropCard(context, snapshot.data!.docs[index])
+                  );
+                }  })));
   }
 
   Stream<QuerySnapshot> getUsersCropsStreamSnapshots(
@@ -119,10 +117,10 @@ class _SellerPageState extends State<SellerPage> {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                 child: Row(children: <Widget>[
-                  const Text('UserName:',
+                  const Text('Location:',
                       style: TextStyle(fontSize: 15.0, color: Colors.white)),
                   const Spacer(),
-                  Text((crop.userName.toString().toUpperCase()),
+                  Text((crop.location.toString().toUpperCase()),
                       style:
                           const TextStyle(fontSize: 15.0, color: Colors.white)),
                 ]),
@@ -178,7 +176,7 @@ class _SellerPageState extends State<SellerPage> {
               Padding(
                 padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -189,7 +187,7 @@ class _SellerPageState extends State<SellerPage> {
                               (transaction) async =>
                                   transaction.delete(document.reference));
                         },
-                        child: const Text('Delete',
+                        child: const Text('Delete Crops',
                             style: TextStyle(
                                 fontSize: 15.0, color: Colors.white))),
                   ],

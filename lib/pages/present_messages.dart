@@ -29,14 +29,15 @@ class _MessagesState extends State<Messages> {
               itemCount: snapshot.data!.docs.length,
               shrinkWrap: true,
               primary: true,
-              physics: const ScrollPhysics(),
+              reverse: true,
+              physics: const BouncingScrollPhysics(),
               itemBuilder: (context, i) {
                 QueryDocumentSnapshot m = snapshot.data!.docs[i];
                 return Card(
                   child: ListTile(
                     title: Column(
                       crossAxisAlignment: currentAccount!.email == m["user"]
-                          ? CrossAxisAlignment.end
+                          ? CrossAxisAlignment.start
                           : CrossAxisAlignment.start,
                       children: [
                         Text(m["msg"],

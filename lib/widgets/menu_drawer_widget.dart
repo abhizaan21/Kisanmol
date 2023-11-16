@@ -1,21 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:kisanmol_app/widgets/constants.dart';
 import '../pages/chat_page.dart';
 import '../screens/login_screen.dart';
 import '../services/auth_service.dart';
 
 class MenuDrawerWidget extends StatelessWidget {
   MenuDrawerWidget({Key? key}) : super(key: key);
-  late var  currentAccount = FirebaseAuth.instance.currentUser;
+  late final  currentAccount = FirebaseAuth.instance.currentUser;
   final db = FirebaseAuth.instance;
 
-  getUser() {
-    final user = db.currentUser;
-    if (user != null) {
-      currentAccount = user;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

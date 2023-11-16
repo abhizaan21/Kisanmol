@@ -48,7 +48,7 @@ class _FirstViewState extends State<FirstView> {
         backgroundColor: kPrimaryColor,
         elevation: 0,
         title: Text(
-          "Kisanmol",
+          "KisanDai",
           style: GoogleFonts.lateef(
               color: white, fontSize: 40, fontWeight: FontWeight.bold),
         ),
@@ -78,7 +78,7 @@ class _FirstViewState extends State<FirstView> {
                         child: Image.asset('assets/icons/crops.png')),
                     SizedBox(
                       child: Text(
-                          "Sell your goods all over india and find a best match for your crops. !",
+                          "Buy and sell goods in Butwal city and find a best match for your Taste Buds. !",
                           textAlign: TextAlign.center,
                           style: GoogleFonts.aleo(
                               color: Colors.black,

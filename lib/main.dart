@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Kisanmol',
+      title: 'KisanDai',
       theme: ThemeData(
         primarySwatch: Colors.orange,
       ),
@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/buyerScreen', page: () => BuyerPage()),
         GetPage(name: '/sellerScreen', page: () => const SellerPage()),
       ],
-        home:  UserManagement().handleAuth(),
+      home:   UserManagement().handleAuth(),
     );
   }
 }

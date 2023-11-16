@@ -15,11 +15,11 @@ class MyChatPage extends StatefulWidget {
 }
 
 class _MyChatPageState extends State<MyChatPage> {
-  final setMessage = FirebaseFirestore.instance;
-  var currentAccount = FirebaseAuth.instance.currentUser;
-  final db = FirebaseAuth.instance;
-  getUser() {
-    final user = db.currentUser;
+  late final FirebaseFirestore setMessage = FirebaseFirestore.instance;
+  User? currentAccount = FirebaseAuth.instance.currentUser;
+
+  void getUser() {
+    final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       currentAccount = user;
     }
@@ -30,7 +30,7 @@ class _MyChatPageState extends State<MyChatPage> {
     super.initState();
     getUser();
   }
-  TextEditingController message = TextEditingController();
+  final TextEditingController message = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -63,14 +63,15 @@ class _MyChatPageState extends State<MyChatPage> {
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(
-                  height: 300,
-                  child: SingleChildScrollView(
-                      physics: ScrollPhysics(),
-                      reverse: true,
-                      child: Messages())),
+               const Expanded(
+                  child: SizedBox(
+                    child: SingleChildScrollView(
+                        physics: ScrollPhysics(),
+                        reverse: true,
+                        child: Messages()),
+                  )),
               Row(
                 children: [
                   Expanded(

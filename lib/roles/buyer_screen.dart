@@ -111,10 +111,10 @@ class BuyerPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                 child: Row(children: <Widget>[
-                  const Text('UserName:',
+                  const Text('Location:',
                       style:  TextStyle(fontSize: 15.0,color:Colors.white)),
                   const Spacer(),
-                  Text((crop.userName.toString().toUpperCase()),
+                  Text((crop.location.toString().toUpperCase()),
                       style:  const TextStyle(fontSize: 15.0,color:Colors.white)),
                 ]),
               ),

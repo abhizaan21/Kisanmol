@@ -2,22 +2,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:kisanmol_app/screens/first_view.dart';
-import 'package:kisanmol_app/screens/login_screen.dart';
 import 'package:kisanmol_app/services/auth_service.dart';
 import 'package:flutter/widgets.dart';
 
 class UserManagement {
   static String id = 'userManagement';
   Widget handleAuth() {
-     return StreamBuilder(
-      stream: AuthService().onAuthStateChanged,
-      builder: (BuildContext context, snapshot) {
-        if (snapshot.hasData) {
-          return authorizeAccess(context);
-        }
-        return const FirstView();
-      }
-    );
+    return StreamBuilder(
+        stream: AuthService().onAuthStateChanged,
+        builder: (BuildContext context, snapshot) {
+          if (snapshot.hasData) {
+            authorizeAccess(context);
+          }
+          return const FirstView();
+        });
   }
 
   authorizeAccess(BuildContext context) {

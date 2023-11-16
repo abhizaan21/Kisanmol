@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kisanmol_app/screens/login_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:kisanmol_app/services/user_management.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -16,16 +14,16 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  Widget currentPage = const LoginScreen();
-  firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
+  late final firebaseAuth = FirebaseAuth.instance;
   late StreamSubscription<User?> user;
+   final Color primaryColor=const Color(0xff109480);
 
   @override
   void initState() {
     super.initState();
     user = FirebaseAuth.instance.authStateChanges().listen((user) {
       Timer(
-      const Duration(seconds: 3),
+      const Duration(seconds: 8),
       () => Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (builder) => UserManagement().handleAuth()),
@@ -43,15 +41,14 @@ class _SplashScreenState extends State<SplashScreen> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      backgroundColor: primaryColor,
+      body: SizedBox(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -60,14 +57,14 @@ class _SplashScreenState extends State<SplashScreen> {
               children: [
                 Image.asset(
                   "assets/images/logo.png",
-                  height: 300.0,
-                  width: 300.0,
+                  height: 500.0,
+                  width: 500.0,
                 ),
                 Text(
                   "A whole garden at your fingertips",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.hurricane(
-                    color: Colors.black,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 32.0,
                   ),

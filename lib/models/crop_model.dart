@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CropModel {
   String? uid;
-  String? userName;
+  String? location;
   String? requirement;
   String? gradeA;
   String? gradeB;
@@ -11,7 +11,7 @@ class CropModel {
 
   CropModel(
       this.uid,
-      this.userName,
+      this.location,
       this.requirement,
       this.gradeA,
       this.gradeB,
@@ -21,7 +21,7 @@ class CropModel {
   //Sending data to the server
   Map<String, dynamic> toJson() => {
         'uid': uid,
-        'userName': userName,
+        'location': location,
         'requirement': requirement,
         'gradeA': gradeA,
         'gradeB': gradeB,
@@ -32,7 +32,7 @@ class CropModel {
   // creating a crop object from a firebase snapshot
   CropModel.fromSnapshot(DocumentSnapshot snapshot)
       : uid = snapshot['uid'],
-        userName = snapshot['userName'],
+        location = snapshot['location'],
         requirement = snapshot['requirement'],
         gradeA = snapshot['gradeA'],
         gradeB = snapshot['gradeB'],

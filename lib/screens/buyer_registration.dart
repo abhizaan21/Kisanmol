@@ -29,7 +29,6 @@ class _BuyerRegistrationScreenState extends State<BuyerRegistrationScreen> {
       TextEditingController();
   final TextEditingController confirmPasswordEditingController =
       TextEditingController();
-  final TextEditingController companyNameEditingController = TextEditingController();
 
   bool circular = false;
   bool isPasswordVisible = false;
@@ -206,31 +205,6 @@ class _BuyerRegistrationScreenState extends State<BuyerRegistrationScreen> {
         ),
       ),
     );
-
-    final companyName = TextFormField(
-      controller: companyNameEditingController,
-      keyboardType: TextInputType.text,
-      validator: (value) {
-        //field validator
-        if (value!.isEmpty) {
-          return ("This field cannot be empty");
-        } else {
-          return null;
-        }
-      },
-      onSaved: (value) {
-        companyNameEditingController.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.person, color: Colors.deepOrangeAccent),
-        contentPadding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
-        hintText: "Company Name",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(25.0),
-        ),
-      ),
-    );
     //End of the fields creation
 
     //SignUp Button
@@ -299,7 +273,7 @@ class _BuyerRegistrationScreenState extends State<BuyerRegistrationScreen> {
                       height: 21,
                     ),
                     SizedBox(
-                      child: Text("SignUp !",
+                      child: Text("SignUp as CropBuyer!",
                           textAlign: TextAlign.center,
                           style: GoogleFonts.aleo(
                               color: Colors.black,
@@ -326,10 +300,6 @@ class _BuyerRegistrationScreenState extends State<BuyerRegistrationScreen> {
                       height: 15,
                     ),
                     confirmPasswordField,
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    companyName,
                     const SizedBox(
                       height: 25,
                     ),
@@ -378,7 +348,6 @@ class _BuyerRegistrationScreenState extends State<BuyerRegistrationScreen> {
     userModel.uid = uid;
     userModel.firstName = firstNameEditingController.text;
     userModel.secondName = secondNameEditingController.text;
-    userModel.companyName=companyNameEditingController.text;
     userModel.farmName="This user is a CropBuyer";
     userModel.role = "Buyer";
 

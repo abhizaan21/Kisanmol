@@ -61,10 +61,12 @@ class _LoginScreenState extends State<LoginScreen> {
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.mail, color: Colors.deepOrangeAccent),
+        prefixIcon: const Icon(Icons.email_outlined, color: Colors.white),
         contentPadding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
         hintText: "name@example.com",
+        hintStyle: const TextStyle(color: Colors.white70),
         labelText: "Email",
+        labelStyle: const TextStyle(color: Colors.white70),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(25.0),
         ),
@@ -93,9 +95,10 @@ class _LoginScreenState extends State<LoginScreen> {
       textInputAction: TextInputAction.done,
       decoration: InputDecoration(
         prefixIcon:
-            const Icon(Icons.lock_sharp, color: Colors.deepOrangeAccent),
+            const Icon(Icons.lock_outline_sharp, color: Colors.white),
         contentPadding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
         hintText: "Password",
+        hintStyle: const TextStyle(color: Colors.white70),
         suffixIcon: IconButton(
           icon: isPasswordVisible
               ? const Icon(Icons.visibility_off, color: Colors.deepOrangeAccent)
@@ -111,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final loginButton = Material(
       borderRadius: BorderRadius.circular(25.0),
-      color: Colors.teal,
+      color: Colors.deepOrangeAccent,
       child: MaterialButton(
         padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
         minWidth: MediaQuery.of(context).size.width,
@@ -208,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     SizedBox(
-                        height: 180,
+                        height: 300,
                         child: Image.asset('assets/images/logo.png')),
                     const SizedBox(
                       height: 40,

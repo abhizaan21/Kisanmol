@@ -33,13 +33,10 @@ class AuthService {
       User? user = result.user;
       return Future.value(user);
     } catch (e) {
-      if (kDebugMode) {
-        print("Sign up failed");
-      }
       final snackBar = SnackBar(content: Text(e.toString()));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return Future.value(null);
     }
-    return Future.value(null);
   }
 
   // Email & Password Sign In
@@ -72,7 +69,7 @@ class AuthService {
     await currentUser.linkWithCredential(credential);
   }
 
-  // GOOGLE
+  // GOOGLE Sign In
   Future<void> signInWithGoogle(BuildContext context) async {
     try {
       final GoogleSignInAccount? googleSignInAccount =
@@ -106,9 +103,6 @@ class AuthService {
         });
       }
     } catch (e) {
-      if (kDebugMode) {
-        print("Log In failed");
-      }
       final snackBar = SnackBar(content: Text(e.toString()));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
