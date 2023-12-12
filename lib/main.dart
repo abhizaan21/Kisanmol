@@ -10,6 +10,7 @@ import 'package:kisanmol_app/screens/splash_screen.dart';
 import 'package:get/get.dart';
 import 'package:kisanmol_app/services/user_management.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false, 
       title: 'KisanDai',
       theme: ThemeData(
         primarySwatch: Colors.orange,

@@ -138,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
       padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
       child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
-            primary: Colors.white,
+            backgroundColor: Colors.white,
             minimumSize: const Size(double.infinity, 48.0),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25.0))),
@@ -164,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
       padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
       child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
-          primary: Colors.blueAccent,
+          backgroundColor: Colors.blueAccent,
           minimumSize: const Size(double.infinity, 48.0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25.0),

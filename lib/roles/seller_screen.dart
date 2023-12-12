@@ -180,8 +180,7 @@ class _SellerPageState extends State<SellerPage> {
                   children: <Widget>[
                     ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          shape: const StadiumBorder(),
-                          primary: kPrimaryColor.shade400,),
+                          shape: const StadiumBorder(), backgroundColor: kPrimaryColor.shade400,),
                         onPressed: () async {
                           await FirebaseFirestore.instance.runTransaction(
                               (transaction) async =>
