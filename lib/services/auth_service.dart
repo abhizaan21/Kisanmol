@@ -2,10 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../utils/resource.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -105,29 +103,6 @@ class AuthService {
     } catch (e) {
       final snackBar = SnackBar(content: Text(e.toString()));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
-  }
-
-  Future<Resource?> signInWithFacebook(BuildContext context) async {
-    try {
-      final LoginResult result = await FacebookAuth.instance.login();
-      switch (result.status) {
-        case LoginStatus.success:
-          final AuthCredential facebookCredential =
-              FacebookAuthProvider.credential(result.accessToken!.token);
-          final userCredential =
-              await _firebaseAuth.signInWithCredential(facebookCredential);
-          storeTokenAndData(userCredential);
-          return Resource(status: Status.success);
-        case LoginStatus.cancelled:
-          return Resource(status: Status.cancelled);
-        case LoginStatus.failed:
-          return Resource(status: Status.error);
-        default:
-          return null;
-      }
-    } catch (e) {
-      rethrow;
     }
   }
 

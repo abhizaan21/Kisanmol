@@ -32,7 +32,7 @@ class CropModel {
   // creating a crop object from a firebase snapshot
   CropModel.fromSnapshot(DocumentSnapshot snapshot)
       : uid = snapshot['uid'],
-        location = snapshot['location'],
+        location = snapshot.data().toString().contains('location')?snapshot.get('location'):'',
         requirement = snapshot['requirement'],
         gradeA = snapshot['gradeA'],
         gradeB = snapshot['gradeB'],

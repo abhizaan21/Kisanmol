@@ -6,9 +6,15 @@ import '../services/auth_service.dart';
 
 class MenuDrawerWidget extends StatelessWidget {
   MenuDrawerWidget({Key? key}) : super(key: key);
-  late final  currentAccount = FirebaseAuth.instance.currentUser;
+  late var  currentAccount = FirebaseAuth.instance.currentUser;
   final db = FirebaseAuth.instance;
 
+  getUser() {
+    final user = db.currentUser;
+    if (user != null) {
+      currentAccount = user;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

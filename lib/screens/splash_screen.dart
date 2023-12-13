@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kisanmol_app/services/user_management.dart';
+import 'package:splash_view/splash_view.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -23,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     user = FirebaseAuth.instance.authStateChanges().listen((user) {
       Timer(
-      const Duration(seconds: 8),
+      const Duration(seconds: 5),
       () => Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (builder) => UserManagement().handleAuth()),
@@ -70,10 +71,6 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                 ),
               ],
-            ),
-            const CircularProgressIndicator(
-              valueColor:
-                  AlwaysStoppedAnimation<Color>(Colors.deepOrangeAccent),
             ),
           ],
         ),

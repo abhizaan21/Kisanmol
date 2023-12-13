@@ -13,7 +13,7 @@ import 'package:kisanmol_app/services/user_management.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: const FirebaseOptions(apiKey:"AIzaSyCOMzL43oC_tJ0y2gHqDQxIaidnqwvFIlU",appId:"1:144720103000:android:1f9362d39564dba423ec2d",messagingSenderId:"144720103000",projectId:"kisanmol-ba099"));
   runApp(const MyApp());
 }
 

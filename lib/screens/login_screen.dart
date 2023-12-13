@@ -159,32 +159,6 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
 
-    //Facebook Login
-    final facebookLoginButton = ButtonTheme(
-      padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
-      child: ElevatedButton.icon(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blueAccent,
-          minimumSize: const Size(double.infinity, 48.0),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25.0),
-          ),
-        ),
-        label: const Text(
-          'Continue with Facebook',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white, fontSize: 16),
-        ),
-        onPressed: () {
-          AuthService().signInWithFacebook(context);
-          Get.offNamed('/buyerScreen');
-        },
-        icon: const FaIcon(
-          FontAwesomeIcons.facebook,
-          color: Colors.white,
-        ),
-      ),
-    );
 
     return Scaffold(
       body: Center(
@@ -239,10 +213,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 15,
                     ),
                     googleSignInButton,
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    facebookLoginButton,
                     const SizedBox(
                       height: 10,
                     ),
